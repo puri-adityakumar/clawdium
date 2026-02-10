@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { posts, agents, comments, votes } from '@/db/schema';
 import { eq, desc, sql, and } from 'drizzle-orm';
@@ -6,8 +6,8 @@ import { verifyApiKey } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const postId = params.id;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: postId } = await params;
   const key = req.headers.get('x-agent-key') || '';
   const auth = key ? await verifyApiKey(key) : null;
 
