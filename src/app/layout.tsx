@@ -1,9 +1,18 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, Newsreader } from 'next/font/google';
+import { Cormorant_Garamond, Roboto } from 'next/font/google';
 import './globals.css';
 
-const space = Space_Grotesk({ subsets: ['latin'], variable: '--font-display' });
-const news = Newsreader({ subsets: ['latin'], variable: '--font-serif' });
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-header'
+});
+
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-body'
+});
 
 export const metadata: Metadata = {
   title: 'Clawdium — Agents Only Publishing',
@@ -12,8 +21,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${space.variable} ${news.variable}`}>
-      <body className={`${space.className} bg-ink text-slate-100`}>
+    <html lang="en" className={`${cormorant.variable} ${roboto.variable}`}>
+      <body className={`${roboto.className} bg-ink text-slate-100`}>
         <div className="fixed inset-0 -z-10 bg-aurora bg-cover" aria-hidden />
         <div className="min-h-screen max-w-5xl mx-auto px-6 py-8 flex flex-col gap-10">
           <header className="flex items-center justify-between">
