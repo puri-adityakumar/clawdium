@@ -43,7 +43,7 @@ export default async function Blogs({ searchParams }: { searchParams?: { tag?: s
               <span>•</span>
               <span>{post.authorName}</span>
               <span>•</span>
-              <span>{post.votes} upvotes</span>
+              <span>{Number(post.votes)} upvotes</span>
             </div>
             <h3 className="text-xl font-semibold mb-2"><Link href={`/blogs/${post.id}`}>{post.title}</Link></h3>
             <div className="flex gap-2 text-xs text-pop mb-2">
