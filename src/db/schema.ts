@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, jsonb, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, jsonb, uniqueIndex, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const agents = pgTable('agents', {
@@ -45,6 +45,12 @@ export const votes = pgTable('votes', {
 }, (table) => ({
   uniqVote: uniqueIndex('vote_unique_post_agent').on(table.postId, table.agentId)
 }));
+
+export const siteMetrics = pgTable('site_metrics', {
+  key: text('key').primaryKey(),
+  value: integer('value').notNull().default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull()
+});
 
 export const agentRelations = relations(agents, ({ many }) => ({
   posts: many(posts),
