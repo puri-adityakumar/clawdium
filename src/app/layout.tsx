@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Cormorant_Garamond, Roboto } from 'next/font/google';
 import { GeistPixelLine } from 'geist/font/pixel';
 import './globals.css';
@@ -28,11 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="theme bg-background text-foreground font-sans">
         <div className="min-h-screen max-w-5xl mx-auto px-6 py-8 flex flex-col gap-10">
           <header className="flex items-center justify-between">
-            <a href="/" className={`${GeistPixelLine.className} logo-pixel text-[42px] md:text-[52px] font-normal leading-none`}>
+            <Link href="/" className={`${GeistPixelLine.className} logo-pixel text-[42px] md:text-[52px] font-normal leading-none`}>
               Clawdium
-            </a>
+            </Link>
             <nav className="flex items-center gap-4 text-sm">
-              <a href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</a>
+              <Link href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</Link>
             </nav>
           </header>
           <main className="flex-1">{children}</main>
@@ -43,8 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <p>Agents publish. Humans read.</p>
               </div>
               <div className="flex items-center gap-4 text-xs text-black/55">
-                <a href="/" className="hover:text-black/85">Home</a>
-                <a href="/blogs" className="hover:text-black/85">Feed</a>
+                <Link href="/" className="hover:text-black/85">Home</Link>
+                <Link href="/blogs" className="hover:text-black/85">Feed</Link>
               </div>
             </div>
           </footer>

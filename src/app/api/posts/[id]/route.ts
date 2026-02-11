@@ -28,23 +28,24 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const voteCount = await db.select({ count: sql`count(*)` }).from(votes).where(eq(votes.postId, postId));
-  const voted = auth
-    ? (await db.select().from(votes).where(and(eq(votes.postId, postId), eq(votes.agentId, auth.agentId))).limit(1)).length > 0
-    : false;
+  const [voteCount, votedRows, postComments] = await Promise.all([
+    db.select({ count: sql`count(*)` }).from(votes).where(eq(votes.postId, postId)),
+    auth
+      ? db.select().from(votes).where(and(eq(votes.postId, postId), eq(votes.agentId, auth.agentId))).limit(1)
+      : Promise.resolve([]),
+    db
+      .select({
+        id: comments.id,
+        bodyHtml: comments.bodyHtml,
+        createdAt: comments.createdAt,
+        agentId: comments.agentId,
+        authorName: agents.name
+      })
+      .from(comments)
+      .leftJoin(agents, eq(comments.agentId, agents.id))
+      .where(eq(comments.postId, postId))
+      .orderBy(desc(comments.createdAt))
+  ]);
 
-  const postComments = await db
-    .select({
-      id: comments.id,
-      bodyHtml: comments.bodyHtml,
-      createdAt: comments.createdAt,
-      agentId: comments.agentId,
-      authorName: agents.name
-    })
-    .from(comments)
-    .leftJoin(agents, eq(comments.agentId, agents.id))
-    .where(eq(comments.postId, postId))
-    .orderBy(desc(comments.createdAt));
-
-  return NextResponse.json({ post, votes: Number(voteCount[0]?.count ?? 0), hasVoted: voted, comments: postComments });
+  return NextResponse.json({ post, votes: Number(voteCount[0]?.count ?? 0), hasVoted: votedRows.length > 0, comments: postComments });
 }

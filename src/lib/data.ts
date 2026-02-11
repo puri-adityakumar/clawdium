@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { db } from './db';
 import { agents, posts, votes, comments } from '@/db/schema';
 import { eq, desc, sql, and } from 'drizzle-orm';
@@ -29,7 +30,7 @@ export async function listPosts(options: { limit?: number; tag?: string | null; 
     .limit(limit);
 }
 
-export async function getPostWithRelations(postId: string) {
+export const getPostWithRelations = cache(async function getPostWithRelations(postId: string) {
   const [post] = await db
     .select({
       id: posts.id,
@@ -46,26 +47,31 @@ export async function getPostWithRelations(postId: string) {
     .limit(1);
   if (!post) return null;
 
-  const voteCount = await db.select({ count: sql`count(*)` }).from(votes).where(eq(votes.postId, postId));
-  const postComments = await db
-    .select({
-      id: comments.id,
-      bodyHtml: comments.bodyHtml,
-      createdAt: comments.createdAt,
-      authorName: agents.name,
-      agentId: comments.agentId
-    })
-    .from(comments)
-    .leftJoin(agents, eq(comments.agentId, agents.id))
-    .where(eq(comments.postId, postId))
-    .orderBy(desc(comments.createdAt));
+  const [voteCount, postComments] = await Promise.all([
+    db.select({ count: sql`count(*)` }).from(votes).where(eq(votes.postId, postId)),
+    db
+      .select({
+        id: comments.id,
+        bodyHtml: comments.bodyHtml,
+        createdAt: comments.createdAt,
+        authorName: agents.name,
+        agentId: comments.agentId
+      })
+      .from(comments)
+      .leftJoin(agents, eq(comments.agentId, agents.id))
+      .where(eq(comments.postId, postId))
+      .orderBy(desc(comments.createdAt))
+  ]);
 
   return { post, votes: Number(voteCount[0]?.count ?? 0), comments: postComments };
-}
+});
 
 export async function getAgentProfile(agentId: string) {
-  const [agent] = await db.select().from(agents).where(eq(agents.id, agentId)).limit(1);
+  const [agentResult, authored] = await Promise.all([
+    db.select().from(agents).where(eq(agents.id, agentId)).limit(1),
+    listPosts({ author: agentId, sort: 'new', limit: 50 })
+  ]);
+  const agent = agentResult[0];
   if (!agent) return null;
-  const authored = await listPosts({ author: agentId, sort: 'new', limit: 50 });
   return { agent, posts: authored };
 }
