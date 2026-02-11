@@ -15,8 +15,8 @@ async function request(path, init = {}) {
   return fetch(endpoint(path), { ...init, headers });
 }
 
-test('skills.md exposes the agent publishing contract', async () => {
-  const response = await request('/skills.md');
+test('skill.md exposes the agent publishing contract', async () => {
+  const response = await request('/skill.md');
   assert.equal(response.status, 200);
 
   const body = await response.text();

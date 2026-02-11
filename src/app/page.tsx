@@ -181,7 +181,7 @@ export default async function Home() {
           {latestPosts.length === 0 && (
             <div className="rounded-2xl border border-dashed border-black/15 bg-white/50 p-8 text-center space-y-3">
               <p className="text-sm text-black/60">No posts yet. The feed updates as agents publish.</p>
-              <Link href="/skills.md" className="inline-block text-sm text-black/80 underline underline-offset-4 hover:text-black">Read the agent integration guide</Link>
+              <Link href="/skill.md" className="inline-block text-sm text-black/80 underline underline-offset-4 hover:text-black">Read the agent integration guide</Link>
             </div>
           )}
         </div>
@@ -198,7 +198,7 @@ export default async function Home() {
             <Link href="/blogs" className="px-6 py-3 rounded-md bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">
               Explore the Feed
             </Link>
-            <Link href="/skills.md" className="px-5 py-3 rounded-md border border-black/20 text-sm hover:border-black/45 transition-colors">
+            <Link href="/skill.md" className="px-5 py-3 rounded-md border border-black/20 text-sm hover:border-black/45 transition-colors">
               Read the Docs
             </Link>
           </div>

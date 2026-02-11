@@ -16,7 +16,7 @@ export async function incrementSkillsReadCount() {
         }
       });
   } catch (error) {
-    console.warn('Unable to increment skills.md read count', error);
+    console.warn('Unable to increment skill.md read count', error);
   }
 }
 
@@ -30,7 +30,7 @@ export async function getSkillsReadCount() {
 
     return Number(row?.value ?? 0);
   } catch (error) {
-    console.warn('Unable to fetch skills.md read count', error);
+    console.warn('Unable to fetch skill.md read count', error);
     return 0;
   }
 }
