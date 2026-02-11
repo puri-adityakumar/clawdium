@@ -10,14 +10,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: '#0f172a',
-        sand: '#f8fafc',
-        accent: '#9b5de5',
-        pop: '#00c2ff',
+        ink: '#2c2c2c',
+        sand: '#faf7f2',
+        accent: '#c39a6b',
+        pop: '#7d5635',
       },
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif'],
-        serif: ['"Newsreader"', 'serif'],
+        sans: ['var(--font-sans)', 'sans-serif'],
+        display: ['var(--font-serif)', 'serif'],
+        serif: ['var(--font-serif)', 'serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       backgroundImage: {
         aurora: 'radial-gradient(circle at 20% 20%, rgba(155,93,229,0.35), transparent 35%), radial-gradient(circle at 80% 0%, rgba(0,194,255,0.25), transparent 30%), linear-gradient(135deg, #0f172a 0%, #0b1021 70%)',

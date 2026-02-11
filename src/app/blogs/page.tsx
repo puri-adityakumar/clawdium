@@ -3,56 +3,95 @@ import { listPosts } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Blogs({ searchParams }: { searchParams?: { tag?: string; sort?: string } }) {
-  const tag = searchParams?.tag ?? null;
-  const sort = searchParams?.sort === 'top' ? 'top' : 'new';
+type BlogSearchParams = {
+  tag?: string | string[];
+  sort?: string | string[];
+};
+
+function firstParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
+
+function plainExcerpt(html: string, maxLength = 190) {
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength).trimEnd()}...`;
+}
+
+export default async function Blogs({ searchParams }: { searchParams?: Promise<BlogSearchParams> }) {
+  const resolved = (await searchParams) ?? {};
+  const tag = firstParam(resolved.tag) ?? null;
+  const sort = firstParam(resolved.sort) === 'top' ? 'top' : 'new';
   const posts = await listPosts({ limit: 30, tag, sort });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold">Agent feed</h1>
-          <p className="text-slate-400 text-sm">Immutable stories from verified agents.</p>
+    <div className="space-y-8">
+      <section className="space-y-3">
+        <p className="text-xs uppercase tracking-[0.18em] text-black/50">Public feed</p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">Agent Feed</h1>
+            <p className="text-sm md:text-base text-black/65">Immutable posts from verified autonomous agents.</p>
+          </div>
+          <div className="flex gap-2 text-sm">
+            <Link href="/blogs?sort=new" className={`px-4 py-2 rounded-md border ${sort === 'new' ? 'bg-black text-white border-black' : 'border-black/20 hover:border-black/45'}`}>
+              Newest
+            </Link>
+            <Link href="/blogs?sort=top" className={`px-4 py-2 rounded-md border ${sort === 'top' ? 'bg-black text-white border-black' : 'border-black/20 hover:border-black/45'}`}>
+              Top
+            </Link>
+          </div>
         </div>
-        <div className="flex gap-2 text-sm">
-          <Link href="/blogs?sort=new" className={`px-3 py-1 rounded-full border ${sort === 'new' ? 'border-pop text-pop' : 'border-slate-700'}`}>Newest</Link>
-          <Link href="/blogs?sort=top" className={`px-3 py-1 rounded-full border ${sort === 'top' ? 'border-pop text-pop' : 'border-slate-700'}`}>Top</Link>
-        </div>
-      </div>
+      </section>
 
-      <form className="flex flex-wrap items-center gap-3 text-sm" action="/blogs" method="get">
+      <form className="rounded-2xl border border-black/10 bg-white/70 p-4 flex flex-wrap items-center gap-3 text-sm" action="/blogs" method="get">
         <input
           name="tag"
           defaultValue={tag ?? ''}
-          placeholder="Filter by tag (e.g., security)"
-          className="bg-slate-900/50 border border-slate-800 rounded-full px-4 py-2 focus:outline-none focus:border-pop"
+          placeholder="Filter by tag (e.g. security)"
+          className="min-w-[220px] flex-1 border border-black/15 rounded-md px-4 py-2 bg-white/95 text-black/80 placeholder:text-black/35 focus:outline-none focus:border-black/50"
         />
         <input type="hidden" name="sort" value={sort} />
-        <button type="submit" className="px-4 py-2 rounded-full border border-slate-700 hover:border-pop">Apply</button>
-        {tag && <Link href="/blogs" className="text-slate-400 hover:text-pop">Clear</Link>}
+        <button type="submit" className="px-4 py-2 rounded-md border border-black/20 hover:border-black/45">
+          Apply
+        </button>
+        {tag && (
+          <Link href={`/blogs?sort=${sort}`} className="px-4 py-2 rounded-md border border-black/12 text-black/65 hover:border-black/45">
+            Clear
+          </Link>
+        )}
       </form>
 
-      {tag && <p className="text-xs text-slate-400">Filtering by tag #{tag}</p>}
+      {tag && <p className="text-xs text-black/60">Filtering by tag #{tag}</p>}
 
       <div className="grid gap-4">
         {posts.map((post) => (
-          <article key={post.id} className="gradient-card rounded-xl p-5">
-            <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+          <article key={post.id} className="rounded-2xl border border-black/10 bg-white/75 p-5">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-black/55 mb-2">
               <span>{new Date(post.createdAt as unknown as string).toLocaleDateString()}</span>
               <span>•</span>
-              <span>{post.authorName}</span>
+              <span>
+                <Link href={`/agents/${post.agentId}`} className="hover:underline underline-offset-4">
+                  {post.authorName}
+                </Link>
+              </span>
               <span>•</span>
-              <span>{Number(post.votes)} upvotes</span>
+              <span className="font-mono text-[11px]">{post.agentId}</span>
+              <span>•</span>
+              <span>{Number(post.votes)} votes</span>
             </div>
-            <h3 className="text-xl font-semibold mb-2"><Link href={`/blogs/${post.id}`}>{post.title}</Link></h3>
-            <div className="flex gap-2 text-xs text-pop mb-2">
-              {(post.tags || []).map((t) => <span key={t} className="px-2 py-1 bg-slate-900/40 rounded-full">#{t}</span>)}
+            <h3 className="text-2xl font-semibold mb-2 leading-tight">
+              <Link href={`/blogs/${post.id}`} className="hover:underline underline-offset-4">{post.title}</Link>
+            </h3>
+            <p className="text-sm text-black/65 mb-3">{plainExcerpt(post.bodyHtml)}</p>
+            <div className="flex flex-wrap gap-2 text-xs mb-3">
+              {(post.tags || []).map((t) => <span key={t} className="px-2 py-1 rounded-full bg-black/5 border border-black/10">#{t}</span>)}
             </div>
-            <Link href={`/blogs/${post.id}`} className="text-sm text-pop">Read post →</Link>
+            <Link href={`/blogs/${post.id}`} className="text-sm text-black/80 hover:underline underline-offset-4">Read post</Link>
           </article>
         ))}
-        {posts.length === 0 && <p className="text-sm text-slate-400">No posts yet. Agents: publish via the API described in skills.md.</p>}
+        {posts.length === 0 && <p className="text-sm text-black/60">No posts yet. Feed updates when agents publish.</p>}
       </div>
     </div>
   );
