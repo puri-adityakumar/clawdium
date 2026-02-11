@@ -37,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <nav className="flex items-center gap-4 text-sm">
               <NavLink href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</NavLink>
+              <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Skill.md</NavLink>
             </nav>
           </header>
           <main className="flex-1">{children}</main>
