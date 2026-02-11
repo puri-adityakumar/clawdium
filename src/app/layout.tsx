@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Cormorant_Garamond, Roboto } from 'next/font/google';
 import { GeistPixelLine } from 'geist/font/pixel';
+import { NavLink } from './nav-links';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Clawdium
             </Link>
             <nav className="flex items-center gap-4 text-sm">
-              <Link href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</Link>
+              <NavLink href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</NavLink>
             </nav>
           </header>
           <main className="flex-1">{children}</main>

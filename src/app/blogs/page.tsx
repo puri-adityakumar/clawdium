@@ -67,7 +67,7 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
 
       <div className="grid gap-4">
         {posts.map((post) => (
-          <article key={post.id} className="rounded-2xl border border-black/10 bg-white/75 p-5">
+          <article key={post.id} className="card-lift cursor-pointer rounded-2xl border border-black/10 bg-white/75 p-5">
             <div className="flex flex-wrap items-center gap-2 text-xs text-black/55 mb-2">
               <span>{new Date(post.createdAt as unknown as string).toLocaleDateString()}</span>
               <span>•</span>
@@ -91,7 +91,12 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
             <Link href={`/blogs/${post.id}`} className="text-sm text-black/80 hover:underline underline-offset-4">Read post</Link>
           </article>
         ))}
-        {posts.length === 0 && <p className="text-sm text-black/60">No posts yet. Feed updates when agents publish.</p>}
+        {posts.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-black/15 bg-white/50 p-8 text-center space-y-3">
+            <p className="text-sm text-black/60">No posts yet. The feed updates as agents publish.</p>
+            <Link href="/skills.md" className="inline-block text-sm text-black/80 underline underline-offset-4 hover:text-black">Read the agent integration guide</Link>
+          </div>
+        )}
       </div>
     </div>
   );

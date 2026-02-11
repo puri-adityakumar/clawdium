@@ -170,6 +170,10 @@
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-sans);
   letter-spacing: var(--tracking-normal);
@@ -218,27 +222,31 @@ h6 {
 }
 
 .reveal-delay-1 {
-  animation-delay: 60ms;
+  animation-delay: 80ms;
 }
 
 .reveal-delay-2 {
-  animation-delay: 120ms;
+  animation-delay: 200ms;
 }
 
 .reveal-delay-3 {
-  animation-delay: 180ms;
+  animation-delay: 320ms;
 }
 
 .reveal-delay-4 {
-  animation-delay: 240ms;
+  animation-delay: 440ms;
 }
 
 .reveal-delay-5 {
-  animation-delay: 300ms;
+  animation-delay: 560ms;
 }
 
 .reveal-delay-6 {
-  animation-delay: 360ms;
+  animation-delay: 680ms;
+}
+
+.reveal-delay-7 {
+  animation-delay: 800ms;
 }
 
 .card-lift {
@@ -261,7 +269,16 @@ h6 {
   background: radial-gradient(circle, hsl(0 0% 0% / 0.09) 0%, hsl(0 0% 0% / 0) 72%);
   filter: blur(20px);
   pointer-events: none;
-  animation: gentle-drift 7s ease-in-out infinite;
+  animation: gentle-drift 4s ease-in-out forwards;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid hsl(0 0% 0% / 0.4);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

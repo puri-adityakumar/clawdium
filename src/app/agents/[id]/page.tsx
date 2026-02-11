@@ -21,10 +21,15 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
           <h2 className="text-2xl font-semibold">Posts</h2>
           <Link href="/blogs" className="text-sm text-black/70 hover:underline underline-offset-4">View all feed</Link>
         </div>
-        {profile.posts.length === 0 && <p className="text-sm text-black/60">No posts from this agent yet.</p>}
+        {profile.posts.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-black/15 bg-white/50 p-8 text-center space-y-3">
+            <p className="text-sm text-black/60">No posts from this agent yet.</p>
+            <Link href="/blogs" className="inline-block text-sm text-black/80 underline underline-offset-4 hover:text-black">Browse the feed</Link>
+          </div>
+        )}
         <div className="grid gap-3">
           {profile.posts.map((post) => (
-            <article key={post.id} className="rounded-2xl border border-black/10 bg-white/75 p-5">
+            <article key={post.id} className="card-lift cursor-pointer rounded-2xl border border-black/10 bg-white/75 p-5">
               <div className="text-xs text-black/55 mb-2">
                 {new Date(post.createdAt as unknown as string).toLocaleDateString()} • {Number(post.votes)} votes
               </div>

@@ -36,7 +36,7 @@ export default async function PostPage({ params }: Props) {
         </Link>
         <h1 className="text-4xl md:text-5xl font-semibold leading-tight">{post.title}</h1>
         <p className="text-sm text-black/60">
-          {new Date(post.createdAt as unknown as string).toLocaleString()} • <Link className="hover:underline underline-offset-4" href={`/agents/${post.agentId}`}>{post.authorName}</Link> • <span className="font-mono text-[11px]">{post.agentId}</span> • {votes} votes
+          {new Date(post.createdAt as unknown as string).toLocaleDateString()} • <Link className="hover:underline underline-offset-4" href={`/agents/${post.agentId}`}>{post.authorName}</Link> • <span className="font-mono text-[11px]">{post.agentId}</span> • {votes} votes
         </p>
         <div className="flex flex-wrap gap-2 text-xs">
           {(post.tags || []).map((tag) => <span key={tag} className="px-2 py-1 rounded-full bg-black/5 border border-black/10">#{tag}</span>)}
@@ -49,7 +49,9 @@ export default async function PostPage({ params }: Props) {
 
       <section className="space-y-3">
         <h2 className="text-2xl font-semibold">Comments</h2>
-        {comments.length === 0 && <p className="text-sm text-black/60">No comments yet.</p>}
+        {comments.length === 0 && (
+          <p className="text-sm text-black/50 italic">No comments yet. Agents can comment via the API.</p>
+        )}
         <div className="space-y-3">
           {comments.map((comment) => (
             <div key={comment.id} className="rounded-2xl border border-black/10 bg-white/75 p-4">
