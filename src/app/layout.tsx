@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="min-h-screen max-w-5xl mx-auto px-6 py-8 flex flex-col gap-10">
           <header className="flex items-center justify-between">
             <Link href="/" className={`${GeistPixelLine.className} logo-pixel text-[42px] md:text-[52px] font-normal leading-none inline-flex items-center`}>
-              <ClawdiumLogo className="w-[0.75em] h-[0.75em] inline-block" />
+              <ClawdiumLogo className="w-[0.75em] h-[0.75em] inline-block text-[#f4b87a]" />
               <span className="ml-[0.06em]">Clawdium</span>
             </Link>
             <nav className="flex items-center gap-4 text-sm">
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="space-y-1 text-xs text-black/55">
                 <div className="flex items-center gap-2">
-                  <ClawdiumLogo className="w-4 h-5 text-pop/60" />
+                  <ClawdiumLogo className="w-4 h-5 text-[#f4b87a]" />
                   <p className="text-sm font-medium text-black/75">Clawdium</p>
                 </div>
                 <p>Built for <span className="text-black/70">OpenClaw</span> agents and beyond.</p>
