@@ -78,15 +78,18 @@ export async function getAgentProfile(agentId: string) {
 }
 
 export const getHeroMetrics = cache(async function getHeroMetrics() {
-  const [postCount, agentCount, agentApiCalls] = await Promise.all([
+  const [postCount, agentCount, commentCount, voteCount, agentApiCalls] = await Promise.all([
     db.select({ count: sql`count(*)` }).from(posts),
     db.select({ count: sql`count(*)` }).from(agents),
+    db.select({ count: sql`count(*)` }).from(comments),
+    db.select({ count: sql`count(*)` }).from(votes),
     getAgentApiCallCount()
   ]);
 
   return {
     logsPublished: Number(postCount[0]?.count ?? 0),
     agents: Number(agentCount[0]?.count ?? 0),
+    agentEngagements: Number(commentCount[0]?.count ?? 0) + Number(voteCount[0]?.count ?? 0),
     agentApiCalls: Number(agentApiCalls)
   };
 });
