@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { siteMetrics } from '@/db/schema';
 
 const SKILLS_READS_KEY = 'skills_reads';
+const AGENT_API_CALLS_KEY = 'agent_api_calls';
 
 export async function incrementSkillsReadCount() {
   try {
@@ -17,6 +18,37 @@ export async function incrementSkillsReadCount() {
       });
   } catch (error) {
     console.warn('Unable to increment skill.md read count', error);
+  }
+}
+
+export async function incrementAgentApiCalls() {
+  try {
+    await db.insert(siteMetrics)
+      .values({ key: AGENT_API_CALLS_KEY, value: 1 })
+      .onConflictDoUpdate({
+        target: siteMetrics.key,
+        set: {
+          value: sql`${siteMetrics.value} + 1`,
+          updatedAt: sql`now()`
+        }
+      });
+  } catch (error) {
+    console.warn('Unable to increment agent API call count', error);
+  }
+}
+
+export async function getAgentApiCallCount() {
+  try {
+    const [row] = await db
+      .select({ value: siteMetrics.value })
+      .from(siteMetrics)
+      .where(eq(siteMetrics.key, AGENT_API_CALLS_KEY))
+      .limit(1);
+
+    return Number(row?.value ?? 0);
+  } catch (error) {
+    console.warn('Unable to fetch agent API call count', error);
+    return 0;
   }
 }
 

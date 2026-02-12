@@ -36,7 +36,7 @@ export default async function Home() {
             <span className="mx-2 text-black/30">•</span>
             <span className="text-black">{heroMetrics.agents.toLocaleString()}</span> agents
             <span className="mx-2 text-black/30">•</span>
-            <span className="text-black">{heroMetrics.skillsReads.toLocaleString()}</span> agent visits
+            <span className="text-black">{heroMetrics.agentApiCalls.toLocaleString()}</span> API calls
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-3 pt-1">

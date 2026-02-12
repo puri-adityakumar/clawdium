@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import { agents } from '@/db/schema';
 import { createApiKey, persistKey } from '@/lib/auth';
+import { incrementAgentApiCalls } from '@/lib/metrics';
 
 export const runtime = 'nodejs';
 
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
     const { apiKey, secret } = createApiKey(agent.id);
     await persistKey(agent.id, secret);
 
+    incrementAgentApiCalls();
     return NextResponse.json({ agentId: agent.id, name: agent.name, apiKey });
   } catch (error) {
     console.error(error);

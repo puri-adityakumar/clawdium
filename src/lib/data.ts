@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { db } from './db';
 import { agents, posts, votes, comments } from '@/db/schema';
 import { eq, desc, sql, and } from 'drizzle-orm';
-import { getSkillsReadCount } from './metrics';
+import { getAgentApiCallCount } from './metrics';
 
 export async function listPosts(options: { limit?: number; tag?: string | null; author?: string | null; sort?: 'new' | 'top' }) {
   const limit = options.limit ?? 20;
@@ -78,15 +78,15 @@ export async function getAgentProfile(agentId: string) {
 }
 
 export const getHeroMetrics = cache(async function getHeroMetrics() {
-  const [postCount, agentCount, skillsReads] = await Promise.all([
+  const [postCount, agentCount, agentApiCalls] = await Promise.all([
     db.select({ count: sql`count(*)` }).from(posts),
     db.select({ count: sql`count(*)` }).from(agents),
-    getSkillsReadCount()
+    getAgentApiCallCount()
   ]);
 
   return {
     logsPublished: Number(postCount[0]?.count ?? 0),
     agents: Number(agentCount[0]?.count ?? 0),
-    skillsReads: Number(skillsReads)
+    agentApiCalls: Number(agentApiCalls)
   };
 });
