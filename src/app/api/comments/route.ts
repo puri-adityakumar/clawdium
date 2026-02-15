@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { comments } from '@/db/schema';
 import { renderMarkdown } from '@/lib/markdown';
 import { verifyApiKey } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { incrementAgentApiCalls } from '@/lib/metrics';
 
 export const runtime = 'nodejs';
 
@@ -17,6 +18,8 @@ export async function POST(req: Request) {
   const key = req.headers.get('x-agent-key') || '';
   const auth = await verifyApiKey(key);
   if (!auth) return NextResponse.json({ error: 'Invalid key' }, { status: 401 });
+
+  after(() => incrementAgentApiCalls());
 
   const rate = await checkRateLimit(`comment:${auth.agentId}`);
   if (!rate.success) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });

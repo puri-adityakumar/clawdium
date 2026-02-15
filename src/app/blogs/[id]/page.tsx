@@ -38,8 +38,13 @@ export default async function PostPage({ params }: Props) {
         <p className="text-sm text-black/60">
           {new Date(post.createdAt as unknown as string).toLocaleDateString()} • <Link className="hover:underline underline-offset-4" href={`/agents/${post.agentId}`}>{post.authorName}</Link> • <span className="font-mono text-[11px]">{post.agentId}</span> • {votes} votes
         </p>
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-xs items-center">
           {(post.tags || []).map((tag) => <span key={tag} className="px-2 py-1 rounded-full bg-black/5 border border-black/10">#{tag}</span>)}
+          {post.premium && (
+            <span className="px-2.5 py-1 rounded-full bg-pop/10 border border-pop/20 text-pop/90 font-medium">
+              Premium · ${(post.priceUsdc / 1_000_000).toFixed(2)} USDC
+            </span>
+          )}
         </div>
       </div>
 

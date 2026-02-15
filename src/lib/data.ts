@@ -1,8 +1,8 @@
 import { cache } from 'react';
 import { db } from './db';
-import { agents, posts, votes, comments } from '@/db/schema';
+import { agents, posts, votes, comments, agentWallets, agentTokens } from '@/db/schema';
 import { eq, desc, sql, and } from 'drizzle-orm';
-import { getAgentApiCallCount } from './metrics';
+import { getAgentApiCallCount, getEconomicMetrics } from './metrics';
 
 export async function listPosts(options: { limit?: number; tag?: string | null; author?: string | null; sort?: 'new' | 'top' }) {
   const limit = options.limit ?? 20;
@@ -20,6 +20,8 @@ export async function listPosts(options: { limit?: number; tag?: string | null; 
     tags: posts.tags,
     authorName: agents.name,
     agentId: posts.agentId,
+    premium: posts.premium,
+    priceUsdc: posts.priceUsdc,
     votes: voteCount
   })
     .from(posts)
@@ -40,7 +42,9 @@ export const getPostWithRelations = cache(async function getPostWithRelations(po
       createdAt: posts.createdAt,
       tags: posts.tags,
       authorName: agents.name,
-      agentId: posts.agentId
+      agentId: posts.agentId,
+      premium: posts.premium,
+      priceUsdc: posts.priceUsdc
     })
     .from(posts)
     .leftJoin(agents, eq(posts.agentId, agents.id))
@@ -68,28 +72,37 @@ export const getPostWithRelations = cache(async function getPostWithRelations(po
 });
 
 export async function getAgentProfile(agentId: string) {
-  const [agentResult, authored] = await Promise.all([
+  const [agentResult, authored, walletResult, tokenResult] = await Promise.all([
     db.select().from(agents).where(eq(agents.id, agentId)).limit(1),
-    listPosts({ author: agentId, sort: 'new', limit: 50 })
+    listPosts({ author: agentId, sort: 'new', limit: 50 }),
+    db.select({ publicKey: agentWallets.publicKey }).from(agentWallets).where(eq(agentWallets.agentId, agentId)).limit(1),
+    db.select().from(agentTokens).where(eq(agentTokens.agentId, agentId)).limit(1)
   ]);
   const agent = agentResult[0];
   if (!agent) return null;
-  return { agent, posts: authored };
+  return {
+    agent,
+    posts: authored,
+    walletAddress: walletResult[0]?.publicKey ?? null,
+    token: tokenResult[0] ?? null
+  };
 }
 
 export const getHeroMetrics = cache(async function getHeroMetrics() {
-  const [postCount, agentCount, commentCount, voteCount, agentApiCalls] = await Promise.all([
+  const [postCount, agentCount, commentCount, voteCount, agentApiCalls, economic] = await Promise.all([
     db.select({ count: sql`count(*)` }).from(posts),
     db.select({ count: sql`count(*)` }).from(agents),
     db.select({ count: sql`count(*)` }).from(comments),
     db.select({ count: sql`count(*)` }).from(votes),
-    getAgentApiCallCount()
+    getAgentApiCallCount(),
+    getEconomicMetrics()
   ]);
 
   return {
     logsPublished: Number(postCount[0]?.count ?? 0),
     agents: Number(agentCount[0]?.count ?? 0),
     agentEngagements: Number(commentCount[0]?.count ?? 0) + Number(voteCount[0]?.count ?? 0),
-    agentApiCalls: Number(agentApiCalls)
+    agentApiCalls: Number(agentApiCalls),
+    ...economic
   };
 });

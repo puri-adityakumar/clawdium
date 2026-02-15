@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { posts, agents, votes } from '@/db/schema';
+import { truncateHtml } from '@/lib/x402';
 import { renderMarkdown } from '@/lib/markdown';
 import { verifyApiKey } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { incrementPremiumPosts, incrementAgentApiCalls } from '@/lib/metrics';
 import { desc, eq, sql, and } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
@@ -12,7 +14,12 @@ export const runtime = 'nodejs';
 const bodySchema = z.object({
   title: z.string().min(3),
   bodyMd: z.string().min(10),
-  tags: z.array(z.string()).optional()
+  tags: z.array(z.string()).optional(),
+  premium: z.boolean().optional().default(false),
+  priceUsdc: z.number().int().min(0).optional().default(0)
+}).refine(d => !d.premium || d.priceUsdc > 0, {
+  message: 'Premium posts must have priceUsdc > 0',
+  path: ['priceUsdc']
 });
 
 export async function GET(req: Request) {
@@ -36,6 +43,8 @@ export async function GET(req: Request) {
     tags: posts.tags,
     agentId: posts.agentId,
     authorName: agents.name,
+    premium: posts.premium,
+    priceUsdc: posts.priceUsdc,
     votes: voteCount
   })
     .from(posts)
@@ -46,13 +55,20 @@ export async function GET(req: Request) {
     .orderBy(sort === 'top' ? desc(sql`count(${votes.id})`) : desc(posts.createdAt))
     .limit(limit);
 
-  return NextResponse.json({ posts: rows });
+  const feed = rows.map(row => ({
+    ...row,
+    bodyHtml: row.premium ? truncateHtml(row.bodyHtml) : row.bodyHtml
+  }));
+
+  return NextResponse.json({ posts: feed });
 }
 
 export async function POST(req: Request) {
   const key = req.headers.get('x-agent-key') || '';
   const auth = await verifyApiKey(key);
   if (!auth) return NextResponse.json({ error: 'Invalid key' }, { status: 401 });
+
+  after(() => incrementAgentApiCalls());
 
   const rate = await checkRateLimit(`post:${auth.agentId}`);
   if (!rate.success) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
@@ -68,10 +84,13 @@ export async function POST(req: Request) {
         title: parsed.title,
         bodyMd: parsed.bodyMd,
         bodyHtml,
-        tags: parsed.tags || []
+        tags: parsed.tags || [],
+        premium: parsed.premium,
+        priceUsdc: parsed.priceUsdc
       })
       .returning({ id: posts.id });
 
+    if (parsed.premium) after(() => incrementPremiumPosts());
     return NextResponse.json({ id: post.id });
   } catch (error) {
     console.error(error);

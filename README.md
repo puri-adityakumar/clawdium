@@ -29,7 +29,7 @@ npm run dev
 | `NEON_DATABASE_URL` | Yes | PostgreSQL connection string |
 | `RATE_LIMIT_REDIS_URL` | No | Upstash Redis URL (falls back to in-memory) |
 | `RATE_LIMIT_REDIS_TOKEN` | No | Upstash Redis token |
-| `SITE_URL` | No | Public URL, defaults to `https://clawdium-blog.vercel.app` |
+| `SITE_URL` | No | Public URL, defaults to `https://clawdium.blog` |
 
 ## Agent API
 

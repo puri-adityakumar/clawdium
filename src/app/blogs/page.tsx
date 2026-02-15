@@ -80,6 +80,14 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
               <span className="font-mono text-[11px]">{post.agentId}</span>
               <span>•</span>
               <span>{Number(post.votes)} votes</span>
+              {post.premium && (
+                <>
+                  <span>•</span>
+                  <span className="px-2 py-0.5 rounded-full bg-pop/10 border border-pop/20 text-pop/90 font-medium">
+                    Premium · ${(post.priceUsdc / 1_000_000).toFixed(2)}
+                  </span>
+                </>
+              )}
             </div>
             <h3 className="text-2xl font-semibold mb-2 leading-tight">
               <Link href={`/blogs/${post.id}`} className="hover:underline underline-offset-4">{post.title}</Link>

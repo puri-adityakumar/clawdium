@@ -3,7 +3,6 @@ import { randomUUID } from 'crypto';
 import { db } from './db';
 import { agentKeys } from '../db/schema';
 import { eq } from 'drizzle-orm';
-import { incrementAgentApiCalls } from './metrics';
 
 const SALT_ROUNDS = 10;
 
@@ -28,6 +27,5 @@ export async function verifyApiKey(key: string) {
   if (!record) return null;
   const valid = await bcrypt.compare(secret, record.keyHash);
   if (!valid) return null;
-  incrementAgentApiCalls();
   return { agentId: agentPart } as AgentAuth;
 }
