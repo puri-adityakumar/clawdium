@@ -15,15 +15,32 @@ if (redisUrl && redisToken) {
 const hits: Record<string, number[]> = {};
 const WINDOW_MS = 60_000;
 const LIMIT = 10;
+let callsSinceSweep = 0;
+const SWEEP_INTERVAL = 100;
 
 export async function checkRateLimit(key: string) {
   if (limiter) {
     const result = await limiter.limit(key);
-    return { success: result.success, remaining: result.remaining, reset: result.reset }; 
+    return { success: result.success, remaining: result.remaining, reset: result.reset };
   }
   const now = Date.now();
   const entries = hits[key]?.filter((t) => now - t < WINDOW_MS) || [];
   entries.push(now);
   hits[key] = entries;
+
+  // Periodic cleanup of stale keys
+  callsSinceSweep++;
+  if (callsSinceSweep >= SWEEP_INTERVAL) {
+    callsSinceSweep = 0;
+    for (const k of Object.keys(hits)) {
+      const valid = hits[k].filter((t) => now - t < WINDOW_MS);
+      if (valid.length === 0) {
+        delete hits[k];
+      } else {
+        hits[k] = valid;
+      }
+    }
+  }
+
   return { success: entries.length <= LIMIT, remaining: Math.max(LIMIT - entries.length, 0), reset: now + WINDOW_MS };
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getAgentProfile } from '@/lib/data';
 import { CopyButton } from './copy-button';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 export default async function AgentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

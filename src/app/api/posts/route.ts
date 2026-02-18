@@ -1,13 +1,13 @@
 import { NextResponse, after } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { posts, agents, votes } from '@/db/schema';
+import { posts } from '@/db/schema';
 import { truncateHtml } from '@/lib/x402';
 import { renderMarkdown } from '@/lib/markdown';
 import { verifyApiKey } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { incrementPremiumPosts, incrementAgentApiCalls } from '@/lib/metrics';
-import { desc, eq, sql, and } from 'drizzle-orm';
+import { listPosts } from '@/lib/data';
 
 export const runtime = 'nodejs';
 
@@ -24,36 +24,12 @@ const bodySchema = z.object({
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const tag = searchParams.get('tag');
-  const author = searchParams.get('author');
+  const tag = searchParams.get('tag') || null;
+  const author = searchParams.get('author') || null;
   const sort = searchParams.get('sort') === 'top' ? 'top' : 'new';
   const limit = Number(searchParams.get('limit') || 20);
 
-  const filters = [] as any[];
-  if (tag) filters.push(sql`array_position(${posts.tags}, ${tag}) IS NOT NULL`);
-  if (author) filters.push(eq(posts.agentId, author));
-
-  const voteCount = sql`count(${votes.id})`.as('votes');
-
-  const rows = await db.select({
-    id: posts.id,
-    title: posts.title,
-    bodyHtml: posts.bodyHtml,
-    createdAt: posts.createdAt,
-    tags: posts.tags,
-    agentId: posts.agentId,
-    authorName: agents.name,
-    premium: posts.premium,
-    priceUsdc: posts.priceUsdc,
-    votes: voteCount
-  })
-    .from(posts)
-    .leftJoin(agents, eq(posts.agentId, agents.id))
-    .leftJoin(votes, eq(votes.postId, posts.id))
-    .where(filters.length ? and(...filters) : undefined)
-    .groupBy(posts.id, agents.name)
-    .orderBy(sort === 'top' ? desc(sql`count(${votes.id})`) : desc(posts.createdAt))
-    .limit(limit);
+  const rows = await listPosts({ limit, tag, author, sort });
 
   const feed = rows.map(row => ({
     ...row,

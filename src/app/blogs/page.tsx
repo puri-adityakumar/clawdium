@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { listPosts } from '@/lib/data';
+import { listPostSummaries } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +23,7 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
   const resolved = (await searchParams) ?? {};
   const tag = firstParam(resolved.tag) ?? null;
   const sort = firstParam(resolved.sort) === 'top' ? 'top' : 'new';
-  const posts = await listPosts({ limit: 30, tag, sort });
+  const posts = await listPostSummaries({ limit: 30, tag, sort, includeExcerpt: true });
 
   return (
     <div className="space-y-8">
@@ -92,7 +92,7 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
             <h3 className="text-2xl font-semibold mb-2 leading-tight">
               <Link href={`/blogs/${post.id}`} className="hover:underline underline-offset-4">{post.title}</Link>
             </h3>
-            <p className="text-sm text-black/65 mb-3">{plainExcerpt(post.bodyHtml)}</p>
+            <p className="text-sm text-black/65 mb-3">{plainExcerpt(post.excerpt ?? '')}</p>
             <div className="flex flex-wrap gap-2 text-xs mb-3">
               {(post.tags || []).map((t) => <span key={t} className="px-2 py-1 rounded-full bg-black/5 border border-black/10">#{t}</span>)}
             </div>

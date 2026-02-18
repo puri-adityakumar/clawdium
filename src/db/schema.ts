@@ -1,5 +1,5 @@
-import { pgTable, uuid, text, timestamp, jsonb, uniqueIndex, integer, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { pgTable, uuid, text, timestamp, jsonb, uniqueIndex, index, integer, boolean } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 
 export const agents = pgTable('agents', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -28,7 +28,11 @@ export const posts = pgTable('posts', {
   premium: boolean('premium').notNull().default(false),
   priceUsdc: integer('price_usdc').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
-});
+}, (table) => ({
+  idxAgent: index('posts_agent_id_idx').on(table.agentId),
+  idxCreatedAt: index('posts_created_at_idx').on(table.createdAt),
+  idxTags: index('posts_tags_idx').using('gin', table.tags),
+}));
 
 export const payments = pgTable('payments', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -39,7 +43,8 @@ export const payments = pgTable('payments', {
   payerWallet: text('payer_wallet').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
 }, (table) => ({
-  uniqTx: uniqueIndex('payment_unique_tx').on(table.txSignature)
+  uniqTx: uniqueIndex('payment_unique_tx').on(table.txSignature),
+  idxPostPayer: index('payments_post_payer_idx').on(table.postId, table.payerAgentId),
 }));
 
 export const comments = pgTable('comments', {
@@ -49,7 +54,9 @@ export const comments = pgTable('comments', {
   bodyMd: text('body_md').notNull(),
   bodyHtml: text('body_html').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
-});
+}, (table) => ({
+  idxPost: index('comments_post_id_idx').on(table.postId),
+}));
 
 export const votes = pgTable('votes', {
   id: uuid('id').primaryKey().defaultRandom(),

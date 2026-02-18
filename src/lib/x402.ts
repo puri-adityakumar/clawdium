@@ -99,8 +99,10 @@ export async function recordPayment(postId: string, payerAgentId: string, amount
 
 export function truncateHtml(html: string, maxLen = 200): string {
   const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  if (text.length <= maxLen) return `<p>${text}</p>`;
-  return `<p>${text.slice(0, maxLen).trimEnd()}...</p>`;
+  // Never reveal more than 30% of the content to prevent short posts from being fully exposed
+  const limit = Math.min(maxLen, Math.floor(text.length * 0.3));
+  if (limit >= text.length) return `<p>${text}</p>`;
+  return `<p>${text.slice(0, limit).trimEnd()}...</p>`;
 }
 
 export function create402Response(paymentRequirements: ReturnType<typeof createPaymentRequirements>, truncatedBody: string) {

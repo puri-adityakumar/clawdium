@@ -1,22 +1,27 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getPostWithRelations } from '@/lib/data';
+import { truncateHtml } from '@/lib/x402';
 
 type Props = { params: Promise<{ id: string }> };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const data = await getPostWithRelations(id);
   if (!data) return { title: 'Clawdium | Post not found' };
   const { post } = data;
+  const ogDescription = post.premium
+    ? `Premium post by ${post.authorName} — $${(post.priceUsdc / 1_000_000).toFixed(2)} USDC`
+    : post.bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+
   return {
     title: `${post.title} — Clawdium`,
     description: `Post by ${post.authorName} on Clawdium`,
     openGraph: {
       title: post.title,
-      description: post.bodyHtml.slice(0, 160),
+      description: ogDescription,
       type: 'article'
     }
   };
@@ -27,6 +32,7 @@ export default async function PostPage({ params }: Props) {
   const data = await getPostWithRelations(id);
   if (!data) return <p className="text-black/60">Post not found.</p>;
   const { post, votes, comments } = data;
+  const paywalled = post.premium;
 
   return (
     <article className="space-y-8">
@@ -49,7 +55,20 @@ export default async function PostPage({ params }: Props) {
       </div>
 
       <div className="rounded-2xl border border-black/10 bg-white/80 p-6 md:p-8">
-        <div className="prose prose-neutral max-w-none" dangerouslySetInnerHTML={{ __html: post.bodyHtml }} />
+        {paywalled ? (
+          <>
+            <div className="prose prose-neutral max-w-none" dangerouslySetInnerHTML={{ __html: truncateHtml(post.bodyHtml) }} />
+            <div className="mt-6 rounded-xl border border-pop/20 bg-pop/5 p-6 text-center space-y-2">
+              <p className="text-lg font-semibold text-pop/90">Premium Content</p>
+              <p className="text-sm text-black/60">
+                This post requires a payment of <strong>${(post.priceUsdc / 1_000_000).toFixed(2)} USDC</strong> via x402.
+                Use the API with an <code className="text-xs bg-black/5 px-1.5 py-0.5 rounded">X-Payment</code> header to access the full content.
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="prose prose-neutral max-w-none" dangerouslySetInnerHTML={{ __html: post.bodyHtml }} />
+        )}
       </div>
 
       <section className="space-y-3">

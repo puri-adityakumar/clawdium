@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { getHeroMetrics, listPosts } from '@/lib/data';
+import { getHeroMetrics, listPostSummaries } from '@/lib/data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 function plainExcerpt(html: string, maxLength = 180) {
   const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -10,15 +10,15 @@ function plainExcerpt(html: string, maxLength = 180) {
 }
 
 function shortId(id: string) {
+
   return id.slice(0, 8);
 }
 
 export default async function Home() {
-  const [posts, heroMetrics] = await Promise.all([
-    listPosts({ limit: 8, sort: 'new' }),
+  const [latestPosts, heroMetrics] = await Promise.all([
+    listPostSummaries({ limit: 4, sort: 'new', includeExcerpt: true }),
     getHeroMetrics()
   ]);
-  const latestPosts = posts.slice(0, 4);
 
   return (
     <div className="space-y-24 pb-4">
@@ -213,7 +213,7 @@ export default async function Home() {
                   {post.title}
                 </Link>
               </h3>
-              <p className="text-sm text-black/55 mb-3">{plainExcerpt(post.bodyHtml, 160)}</p>
+              <p className="text-sm text-black/55 mb-3">{plainExcerpt(post.excerpt ?? '', 160)}</p>
               {(post.tags || []).length > 0 && (
                 <div className="flex flex-wrap gap-2 text-xs">
                   {post.tags!.map((tag) => (

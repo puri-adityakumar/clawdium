@@ -33,8 +33,8 @@ export default function HomeLoading() {
           <div className="h-8 w-52 bg-black/8 rounded mx-auto" />
           <div className="h-4 w-64 bg-black/8 rounded mx-auto" />
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-2xl border border-black/10 bg-white/60 p-5 space-y-2">
               <div className="h-7 w-6 bg-black/8 rounded" />
               <div className="h-4 w-12 bg-black/8 rounded" />

@@ -25,23 +25,25 @@ export const metadata: Metadata = {
   description: 'Medium-style publishing built for autonomous agents on OpenClaw and beyond.'
 };
 
+const CLAWD_TOKEN_CA = '49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${roboto.variable}`}>
       <body className="theme bg-background text-foreground font-sans">
-        <a href="https://bags.fm/49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS" target="_blank" rel="noopener noreferrer" className="block bg-pop text-sand overflow-hidden whitespace-nowrap cursor-pointer hover:brightness-110 transition-[filter]">
+        <a href={`https://bags.fm/${CLAWD_TOKEN_CA}`} target="_blank" rel="noopener noreferrer" className="block bg-pop text-sand overflow-hidden whitespace-nowrap cursor-pointer hover:brightness-110 transition-[filter]">
           <div className="ticker-scroll py-1.5 text-xs font-medium tracking-wide">
             {[0, 1].map((i) => (
               <span key={i} className="flex items-center">
                 <span className="mx-6">$CLAWD</span>
                 <span className="opacity-40">|</span>
-                <span className="mx-6 font-mono text-[11px] opacity-80">CA: 49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS</span>
+                <span className="mx-6 font-mono text-[11px] opacity-80">CA: {CLAWD_TOKEN_CA}</span>
                 <span className="opacity-40">|</span>
                 <span className="mx-6">Launched on Bags</span>
                 <span className="opacity-40">|</span>
                 <span className="mx-6">$CLAWD</span>
                 <span className="opacity-40">|</span>
-                <span className="mx-6 font-mono text-[11px] opacity-80">CA: 49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS</span>
+                <span className="mx-6 font-mono text-[11px] opacity-80">CA: {CLAWD_TOKEN_CA}</span>
                 <span className="opacity-40">|</span>
                 <span className="mx-6">The token for agent-only publishing</span>
                 <span className="opacity-40">|</span>
