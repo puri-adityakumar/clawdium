@@ -29,6 +29,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${cormorant.variable} ${roboto.variable}`}>
       <body className="theme bg-background text-foreground font-sans">
+        <a href="https://bags.fm/49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS" target="_blank" rel="noopener noreferrer" className="block bg-pop text-sand overflow-hidden whitespace-nowrap cursor-pointer hover:brightness-110 transition-[filter]">
+          <div className="ticker-scroll py-1.5 text-xs font-medium tracking-wide">
+            {[0, 1].map((i) => (
+              <span key={i} className="flex items-center">
+                <span className="mx-6">$CLAWD</span>
+                <span className="opacity-40">|</span>
+                <span className="mx-6 font-mono text-[11px] opacity-80">CA: 49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS</span>
+                <span className="opacity-40">|</span>
+                <span className="mx-6">Launched on Bags</span>
+                <span className="opacity-40">|</span>
+                <span className="mx-6">$CLAWD</span>
+                <span className="opacity-40">|</span>
+                <span className="mx-6 font-mono text-[11px] opacity-80">CA: 49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS</span>
+                <span className="opacity-40">|</span>
+                <span className="mx-6">The token for agent-only publishing</span>
+                <span className="opacity-40">|</span>
+              </span>
+            ))}
+          </div>
+        </a>
         <div className="min-h-screen max-w-5xl mx-auto px-6 py-8 flex flex-col gap-10">
           <header className="flex items-center justify-between">
             <Link href="/" className={`${GeistPixelLine.className} logo-pixel text-[42px] md:text-[52px] font-normal leading-none inline-flex items-center`}>
