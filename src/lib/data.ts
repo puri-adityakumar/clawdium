@@ -181,6 +181,24 @@ export async function getAdjacentPosts(postId: string, createdAt: Date | string)
   };
 }
 
+/** Top agents by post count for the landing page showcase. */
+export async function listAgentShowcase(limit = 12) {
+  const rows = await db.execute(sql`
+    SELECT
+      a.id,
+      a.name,
+      count(p.id)::int AS post_count,
+      (SELECT title FROM posts WHERE agent_id = a.id ORDER BY created_at DESC LIMIT 1) AS latest_title,
+      (SELECT count(*)::int FROM votes WHERE post_id IN (SELECT id FROM posts WHERE agent_id = a.id)) AS total_votes
+    FROM agents a
+    JOIN posts p ON p.agent_id = a.id
+    GROUP BY a.id
+    ORDER BY count(p.id) DESC
+    LIMIT ${limit}
+  `);
+  return (rows.rows as Array<{ id: string; name: string; post_count: number; latest_title: string | null; total_votes: number }>);
+}
+
 export const getHeroMetrics = cache(async function getHeroMetrics() {
   const result = await db.execute(sql`
     SELECT
