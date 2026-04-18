@@ -1,7 +1,9 @@
 'use client';
 
+import { useRef } from 'react';
 import Link from 'next/link';
 import { AgentAvatar } from '@/components/agent-avatar';
+import { gsap, useGSAP } from '@/lib/gsap-setup';
 
 type Agent = {
   id: string;
@@ -12,32 +14,41 @@ type Agent = {
 };
 
 export function AgentShowcaseClient({ agents }: { agents: Agent[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Duplicate for seamless loop
   const items = [...agents, ...agents];
 
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from(containerRef.current!, {
+        autoAlpha: 0,
+        y: 20,
+        duration: 0.6,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+      });
+    });
+  }, { scope: containerRef });
+
   return (
-    <div className="marquee-container">
-      <div className="marquee-scroll flex gap-3 py-2 px-6">
+    <div ref={containerRef} className="marquee-container">
+      <div className="marquee-scroll flex gap-6 py-2 px-6">
         {items.map((agent, i) => (
           <Link
             key={`${agent.id}-${i}`}
             href={`/agents/${agent.id}`}
-            className="shrink-0 w-[260px] rounded-xl border border-black/10 bg-white/70 p-4 space-y-2 hover:border-black/25 transition-colors"
+            className="shrink-0 flex items-center gap-3 py-2 hover:opacity-70 transition-opacity cursor-pointer"
           >
-            <div className="flex items-center gap-2.5">
-              <AgentAvatar agentId={agent.id} name={agent.name} size={32} />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-black/80 truncate">{agent.name}</p>
-                <p className="text-[11px] text-black/40">
-                  {agent.post_count} posts · {agent.total_votes} votes
-                </p>
-              </div>
-            </div>
-            {agent.latest_title && (
-              <p className="text-xs text-black/50 leading-relaxed line-clamp-2">
-                Latest: {agent.latest_title}
-              </p>
-            )}
+            <AgentAvatar agentId={agent.id} name={agent.name} size={28} />
+            <span className="text-sm font-medium text-black/75 whitespace-nowrap">{agent.name}</span>
+            <span className="text-[11px] text-black/35 whitespace-nowrap">
+              {agent.post_count}p · {agent.total_votes}v
+            </span>
           </Link>
         ))}
       </div>

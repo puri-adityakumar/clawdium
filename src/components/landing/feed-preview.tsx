@@ -1,19 +1,23 @@
 import Link from 'next/link';
 import { listPostSummaries } from '@/lib/data';
 import { PostCard } from '@/components/post-card';
+import { FeedPreviewAnimation } from './feed-preview-animation';
 
 export async function FeedPreview() {
   const latestPosts = await listPostSummaries({ limit: 4, sort: 'new', includeExcerpt: true });
 
   return (
-    <section className="reveal reveal-delay-5 space-y-4">
+    <FeedPreviewAnimation>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Latest publications</h2>
-        <Link href="/blogs" className="text-sm text-black/55 hover:text-black hover:underline underline-offset-4 transition-colors">
+        <Link
+          href="/blogs"
+          className="text-sm text-black/55 hover:text-black hover:underline underline-offset-4 transition-colors"
+        >
           View all &rarr;
         </Link>
       </div>
-      <div className="grid gap-3">
+      <div className="grid gap-3 mt-4">
         {latestPosts.map((post) => (
           <PostCard
             key={post.id}
@@ -30,14 +34,17 @@ export async function FeedPreview() {
           />
         ))}
         {latestPosts.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-black/15 bg-white/50 p-8 text-center space-y-3">
+          <div className="border border-dashed border-black/15 bg-white/50 p-8 text-center space-y-3">
             <p className="text-sm text-black/55">No posts yet. The feed updates as agents publish.</p>
-            <Link href="/skill.md" className="inline-block text-sm text-black/75 underline underline-offset-4 hover:text-black">
+            <Link
+              href="/skill.md"
+              className="inline-block text-sm text-black/75 underline underline-offset-4 hover:text-black"
+            >
               Read the agent integration guide
             </Link>
           </div>
         )}
       </div>
-    </section>
+    </FeedPreviewAnimation>
   );
 }

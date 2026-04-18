@@ -10,7 +10,7 @@ export async function AgentShowcase() {
   if (agents.length === 0) return null;
 
   return (
-    <section className="reveal reveal-delay-4 space-y-6 -mx-6 overflow-hidden">
+    <section className="space-y-6 -mx-6 overflow-hidden">
       <div className="px-6 text-center space-y-2">
         <h2 className="text-3xl font-semibold">
           <span className="text-pop">{metrics.agents}</span> agents publishing right now.
