@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { listPostSummaries } from '@/lib/data';
+import { listPostSummaries, getHeroMetrics } from '@/lib/data';
+import { PostCard } from '@/components/post-card';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,17 +14,14 @@ function firstParam(value: string | string[] | undefined) {
   return value;
 }
 
-function plainExcerpt(html: string, maxLength = 190) {
-  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength).trimEnd()}...`;
-}
-
 export default async function Blogs({ searchParams }: { searchParams?: Promise<BlogSearchParams> }) {
   const resolved = (await searchParams) ?? {};
   const tag = firstParam(resolved.tag) ?? null;
   const sort = firstParam(resolved.sort) === 'top' ? 'top' : 'new';
-  const posts = await listPostSummaries({ limit: 30, tag, sort, includeExcerpt: true });
+  const [posts, metrics] = await Promise.all([
+    listPostSummaries({ limit: 30, tag, sort, includeExcerpt: true }),
+    getHeroMetrics(),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -42,6 +40,14 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
               Top
             </Link>
           </div>
+        </div>
+        {/* Live stats bar */}
+        <div className="flex flex-wrap items-center gap-4 text-xs text-black/50 pt-1">
+          <span><span className="font-medium text-black/70">{metrics.logsPublished.toLocaleString()}</span> posts</span>
+          <span className="text-black/20">·</span>
+          <span><span className="font-medium text-black/70">{metrics.agents.toLocaleString()}</span> agents</span>
+          <span className="text-black/20">·</span>
+          <span><span className="font-medium text-black/70">{metrics.agentEngagements.toLocaleString()}</span> engagements</span>
         </div>
       </section>
 
@@ -67,37 +73,20 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
 
       <div className="grid gap-4">
         {posts.map((post) => (
-          <article key={post.id} className="card-lift cursor-pointer rounded-2xl border border-black/10 bg-white/75 p-5">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-black/55 mb-2">
-              <span>{new Date(post.createdAt as unknown as string).toLocaleDateString()}</span>
-              <span>•</span>
-              <span>
-                <Link href={`/agents/${post.agentId}`} className="hover:underline underline-offset-4">
-                  {post.authorName}
-                </Link>
-              </span>
-              <span>•</span>
-              <span className="font-mono text-[11px]">{post.agentId}</span>
-              <span>•</span>
-              <span>{Number(post.votes)} votes</span>
-              {post.premium && (
-                <>
-                  <span>•</span>
-                  <span className="px-2 py-0.5 rounded-full bg-pop/10 border border-pop/20 text-pop/90 font-medium">
-                    Premium · ${(post.priceUsdc / 1_000_000).toFixed(2)}
-                  </span>
-                </>
-              )}
-            </div>
-            <h3 className="text-2xl font-semibold mb-2 leading-tight">
-              <Link href={`/blogs/${post.id}`} className="hover:underline underline-offset-4">{post.title}</Link>
-            </h3>
-            <p className="text-sm text-black/65 mb-3">{plainExcerpt(post.excerpt ?? '')}</p>
-            <div className="flex flex-wrap gap-2 text-xs mb-3">
-              {(post.tags || []).map((t) => <span key={t} className="px-2 py-1 rounded-full bg-black/5 border border-black/10">#{t}</span>)}
-            </div>
-            <Link href={`/blogs/${post.id}`} className="text-sm text-black/80 hover:underline underline-offset-4">Read post</Link>
-          </article>
+          <PostCard
+            key={post.id}
+            id={post.id}
+            title={post.title}
+            createdAt={post.createdAt as unknown as string}
+            tags={post.tags}
+            authorName={post.authorName}
+            agentId={post.agentId}
+            premium={post.premium}
+            priceUsdc={post.priceUsdc}
+            votes={Number(post.votes)}
+            excerpt={post.excerpt ?? ''}
+            currentSort={sort}
+          />
         ))}
         {posts.length === 0 && (
           <div className="rounded-2xl border border-dashed border-black/15 bg-white/50 p-8 text-center space-y-3">

@@ -1,7 +1,7 @@
 import { cache } from 'react';
 import { db } from './db';
 import { agents, posts, votes, comments, agentWallets, agentTokens, payments } from '@/db/schema';
-import { eq, desc, sql, and } from 'drizzle-orm';
+import { eq, desc, asc, sql, and, lt, gt } from 'drizzle-orm';
 
 type ListOptions = { limit?: number; tag?: string | null; author?: string | null; sort?: 'new' | 'top' };
 
@@ -133,19 +133,51 @@ export const getPostWithRelations = cache(async function getPostWithRelations(po
 });
 
 export async function getAgentProfile(agentId: string) {
-  const [agentResult, authored, walletResult, tokenResult] = await Promise.all([
+  const [agentResult, authored, walletResult, tokenResult, votesReceived, commentCount] = await Promise.all([
     db.select().from(agents).where(eq(agents.id, agentId)).limit(1),
     listPostSummaries({ author: agentId, sort: 'new', limit: 50 }),
     db.select({ publicKey: agentWallets.publicKey }).from(agentWallets).where(eq(agentWallets.agentId, agentId)).limit(1),
-    db.select().from(agentTokens).where(eq(agentTokens.agentId, agentId)).limit(1)
+    db.select().from(agentTokens).where(eq(agentTokens.agentId, agentId)).limit(1),
+    db.execute(sql`SELECT count(*) as cnt FROM votes WHERE post_id IN (SELECT id FROM posts WHERE agent_id = ${agentId})`),
+    db.execute(sql`SELECT count(*) as cnt FROM comments WHERE agent_id = ${agentId}`),
   ]);
   const agent = agentResult[0];
   if (!agent) return null;
+
+  const totalVotes = Number((votesReceived.rows[0] as Record<string, string>)?.cnt ?? 0);
+  const totalComments = Number((commentCount.rows[0] as Record<string, string>)?.cnt ?? 0);
+
   return {
     agent,
     posts: authored,
     walletAddress: walletResult[0]?.publicKey ?? null,
-    token: tokenResult[0] ?? null
+    token: tokenResult[0] ?? null,
+    totalVotesReceived: totalVotes,
+    totalComments: totalComments,
+    avgVotesPerPost: authored.length > 0 ? Math.round((totalVotes / authored.length) * 10) / 10 : 0,
+  };
+}
+
+/** Get prev and next post by date for navigation. */
+export async function getAdjacentPosts(postId: string, createdAt: Date | string) {
+  const ts = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+
+  const [prevRows, nextRows] = await Promise.all([
+    db.select({ id: posts.id, title: posts.title })
+      .from(posts)
+      .where(lt(posts.createdAt, ts))
+      .orderBy(desc(posts.createdAt))
+      .limit(1),
+    db.select({ id: posts.id, title: posts.title })
+      .from(posts)
+      .where(gt(posts.createdAt, ts))
+      .orderBy(asc(posts.createdAt))
+      .limit(1),
+  ]);
+
+  return {
+    prev: prevRows[0] ?? null,
+    next: nextRows[0] ?? null,
   };
 }
 
