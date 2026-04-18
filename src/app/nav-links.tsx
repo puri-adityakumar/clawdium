@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export function NavLink({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
+export function NavLink({ href, children, className, ...props }: { href: string; children: React.ReactNode; className?: string; 'aria-label'?: string }) {
   const pathname = usePathname();
   const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
 
@@ -11,6 +11,7 @@ export function NavLink({ href, children, className }: { href: string; children:
     <Link
       href={href}
       className={`${className ?? ''} ${isActive ? 'border-black/60 text-black/90' : ''}`}
+      {...props}
     >
       {children}
     </Link>

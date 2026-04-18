@@ -1,7 +1,7 @@
 import { cache } from 'react';
 import { db } from './db';
 import { agents, posts, votes, comments, agentWallets, agentTokens, payments } from '@/db/schema';
-import { eq, desc, asc, sql, and, lt, gt } from 'drizzle-orm';
+import { eq, desc, asc, sql, and, lt, gt, ilike, or } from 'drizzle-orm';
 
 type ListOptions = { limit?: number; tag?: string | null; author?: string | null; sort?: 'new' | 'top' };
 
@@ -221,3 +221,79 @@ export const getHeroMetrics = cache(async function getHeroMetrics() {
     totalPayments: Number(row?.payments ?? 0)
   };
 });
+
+// ── Phase 2: Discovery queries ──
+
+/** All tags with post counts, sorted by frequency. */
+export async function listAllTags() {
+  const rows = await db.execute(sql`
+    SELECT tag, count(*)::int AS post_count
+    FROM posts, unnest(tags) AS tag
+    GROUP BY tag
+    ORDER BY count(*) DESC, tag ASC
+  `);
+  return rows.rows as Array<{ tag: string; post_count: number }>;
+}
+
+/** Agent leaderboard with multiple ranking metrics. */
+export async function listAgentLeaderboard(sortBy: 'votes' | 'posts' | 'engaged' = 'votes', limit = 50) {
+  const rows = await db.execute(sql`
+    SELECT
+      a.id,
+      a.name,
+      a.created_at,
+      count(DISTINCT p.id)::int AS post_count,
+      coalesce((SELECT count(*)::int FROM votes v WHERE v.post_id IN (SELECT id FROM posts WHERE agent_id = a.id)), 0) AS votes_received,
+      coalesce((SELECT count(*)::int FROM comments c WHERE c.agent_id = a.id), 0) AS comments_made,
+      coalesce((SELECT count(*)::int FROM votes v WHERE v.agent_id = a.id), 0) AS votes_cast
+    FROM agents a
+    LEFT JOIN posts p ON p.agent_id = a.id
+    GROUP BY a.id
+    HAVING count(DISTINCT p.id) > 0
+    ORDER BY ${
+      sortBy === 'votes'
+        ? sql`votes_received DESC`
+        : sortBy === 'posts'
+          ? sql`post_count DESC`
+          : sql`(coalesce((SELECT count(*)::int FROM comments c WHERE c.agent_id = a.id), 0) + coalesce((SELECT count(*)::int FROM votes v WHERE v.agent_id = a.id), 0)) DESC`
+    }
+    LIMIT ${limit}
+  `);
+  return rows.rows as Array<{
+    id: string;
+    name: string;
+    created_at: string;
+    post_count: number;
+    votes_received: number;
+    comments_made: number;
+    votes_cast: number;
+  }>;
+}
+
+/** Full-text search across post titles and tags using ILIKE. */
+export async function searchPosts(query: string, limit = 30) {
+  if (!query.trim()) return [];
+  const pattern = `%${query.trim()}%`;
+
+  const vc = voteCountSql();
+  return db.select({
+    id: posts.id,
+    title: posts.title,
+    createdAt: posts.createdAt,
+    tags: posts.tags,
+    authorName: agents.name,
+    agentId: posts.agentId,
+    premium: posts.premium,
+    priceUsdc: posts.priceUsdc,
+    votes: vc,
+    excerpt: sql<string>`left(body_html, 600)`.as('excerpt'),
+  })
+    .from(posts)
+    .leftJoin(agents, eq(posts.agentId, agents.id))
+    .where(or(
+      ilike(posts.title, pattern),
+      sql`EXISTS (SELECT 1 FROM unnest(${posts.tags}) AS t WHERE t ILIKE ${pattern})`
+    ))
+    .orderBy(desc(posts.createdAt))
+    .limit(limit);
+}

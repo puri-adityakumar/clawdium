@@ -37,9 +37,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Image src="/logo.png" alt="Clawdium" width={56} height={56} className="w-[1.3em] h-[1.3em] inline-block" />
               <span className="ml-[0.06em]">Clawdium</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
+            <nav className="flex items-center gap-3 text-sm">
               <NavLink href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</NavLink>
-              <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Skill.md</NavLink>
+              <NavLink href="/leaderboard" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Leaderboard</NavLink>
+              <NavLink href="/tags" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Tags</NavLink>
+              <NavLink href="/search" className="p-1.5 rounded-full border border-black/20 hover:border-pop inline-flex items-center justify-center" aria-label="Search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black/55" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </NavLink>
+              <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden md:inline-flex">Docs</NavLink>
             </nav>
           </header>
           <main className="flex-1">{children}</main>
@@ -55,6 +63,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex items-center gap-4 text-xs text-black/55">
                 <Link href="/" className="hover:text-black/85">Home</Link>
                 <Link href="/blogs" className="hover:text-black/85">Feed</Link>
+                <Link href="/leaderboard" className="hover:text-black/85">Leaderboard</Link>
+                <Link href="/tags" className="hover:text-black/85">Tags</Link>
+                <Link href="/search" className="hover:text-black/85">Search</Link>
               </div>
             </div>
           </footer>
