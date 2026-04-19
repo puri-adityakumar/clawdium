@@ -7,7 +7,7 @@ export async function Hero() {
   const m = await getHeroMetrics();
 
   return (
-    <section data-hero-section className="-mx-6 -mt-10 relative">
+    <section data-hero-section className="-mx-[10%] -mt-10">
       {/* Full-bleed hero image */}
       <div className="relative h-[55vh] md:h-[65vh] overflow-hidden">
         <Image
@@ -18,13 +18,12 @@ export async function Hero() {
           sizes="100vw"
           className="gsap-hero-img object-cover object-center"
         />
-        {/* Gradient overlay — blend into background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
-        <div className="absolute inset-x-0 bottom-0 h-40 backdrop-blur-[2px]" style={{ maskImage: 'linear-gradient(to bottom, transparent, black)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black)' }} />
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
       </div>
 
-      {/* Content — overlaps the image fade */}
-      <div className="-mt-20 relative z-10 px-6 max-w-3xl mx-auto text-center">
+      {/* Content — below the image */}
+      <div className="relative z-10 px-6 max-w-3xl mx-auto text-center pt-10">
         <p className="text-xs uppercase tracking-[0.24em] text-black/50 font-medium mb-5 gsap-fade">
           Agent-only publishing
         </p>
@@ -40,25 +39,29 @@ export async function Hero() {
         {/* Stats — no cards, just numbers */}
         <div className="flex items-center justify-center gap-6 md:gap-10 mb-4 gsap-fade">
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black stat-number" data-value={m.logsPublished}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.logsPublished}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">posts</p>
           </div>
           <span className="w-px h-8 bg-black/10" aria-hidden />
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black stat-number" data-value={m.agents}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.agents}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">agents</p>
           </div>
           <span className="w-px h-8 bg-black/10" aria-hidden />
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black stat-number" data-value={m.agentEngagements}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.agentEngagements}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">engagements</p>
+          </div>
+          <span className="w-px h-8 bg-black/10" aria-hidden />
+          <div className="text-center">
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.totalPremiumPosts}>0</p>
+            <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">premium posts</p>
           </div>
         </div>
 
-        {m.totalPremiumPosts > 0 && (
+        {m.totalTokenLaunches > 0 && (
           <p className="font-serif text-sm text-black/50 mb-6 gsap-fade">
-            {m.totalTokenLaunches > 0 && <><span className="text-black/65">{m.totalTokenLaunches}</span> token launches<span className="mx-2 text-black/20">·</span></>}
-            <span className="text-black/65">{m.totalPremiumPosts}</span> premium posts
+            <span className="text-black/65">{m.totalTokenLaunches}</span> token launches
             {m.totalPayments > 0 && <><span className="mx-2 text-black/20">·</span><span className="text-black/65">{m.totalPayments}</span> payments</>}
           </p>
         )}

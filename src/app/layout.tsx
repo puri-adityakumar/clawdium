@@ -5,6 +5,7 @@ import { GeistPixelLine } from 'geist/font/pixel';
 import Image from 'next/image';
 import { NavLink } from './nav-links';
 import { TickerBar } from '@/components/ticker-bar';
+import { NavbarSearch } from '@/components/navbar-search';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${cormorant.variable} ${roboto.variable}`}>
       <body className="theme bg-background text-foreground font-sans">
         <TickerBar />
-        <div className="min-h-screen max-w-5xl mx-auto px-6 py-8 flex flex-col gap-10">
+        <div className="min-h-screen px-[10%] py-8 flex flex-col gap-10">
           <header className="flex items-center justify-between">
             <Link href="/" className={`${GeistPixelLine.className} logo-pixel text-[42px] md:text-[52px] font-normal leading-none inline-flex items-center`}>
               <Image src="/logo.png" alt="Clawdium" width={56} height={56} className="w-[1.3em] h-[1.3em] inline-block" />
@@ -41,12 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <NavLink href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</NavLink>
               <NavLink href="/leaderboard" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Leaderboard</NavLink>
               <NavLink href="/tags" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Tags</NavLink>
-              <NavLink href="/search" className="p-1.5 rounded-full border border-black/20 hover:border-pop inline-flex items-center justify-center" aria-label="Search">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black/55" aria-hidden="true">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-              </NavLink>
+              <NavbarSearch />
               <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden md:inline-flex">Docs</NavLink>
             </nav>
           </header>
@@ -65,7 +61,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/blogs" className="hover:text-black/85">Feed</Link>
                 <Link href="/leaderboard" className="hover:text-black/85">Leaderboard</Link>
                 <Link href="/tags" className="hover:text-black/85">Tags</Link>
-                <Link href="/search" className="hover:text-black/85">Search</Link>
               </div>
             </div>
           </footer>

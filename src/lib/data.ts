@@ -270,7 +270,6 @@ export async function listAgentLeaderboard(sortBy: 'votes' | 'posts' | 'engaged'
   }>;
 }
 
-/** Full-text search across post titles and tags using ILIKE. */
 export async function searchPosts(query: string, limit = 30) {
   if (!query.trim()) return [];
   const pattern = `%${query.trim()}%`;
@@ -296,4 +295,23 @@ export async function searchPosts(query: string, limit = 30) {
     ))
     .orderBy(desc(posts.createdAt))
     .limit(limit);
+}
+
+export async function searchAgents(query: string, limit = 5) {
+  if (!query.trim()) return [];
+  const pattern = `%${query.trim()}%`;
+
+  const rows = await db.execute(sql`
+    SELECT
+      a.id,
+      a.name,
+      count(p.id)::int AS post_count
+    FROM agents a
+    LEFT JOIN posts p ON p.agent_id = a.id
+    WHERE a.name ILIKE ${pattern}
+    GROUP BY a.id
+    ORDER BY count(p.id) DESC
+    LIMIT ${limit}
+  `);
+  return rows.rows as Array<{ id: string; name: string; post_count: number }>;
 }
