@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 
 const CLAWD_TOKEN_CA = '49DU92WXacRRXRTwtfkvJRTQ1QUMnAKVUwNKrHqXBAGS';
@@ -8,13 +8,18 @@ const STORAGE_KEY = 'ticker-dismissed';
 
 export function TickerBar() {
   const pathname = usePathname();
-  const [dismissed, setDismissed] = useState(true); // default hidden to prevent flash
+  const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading from localStorage on mount is hydration-safe
     setDismissed(localStorage.getItem(STORAGE_KEY) === '1');
   }, []);
 
-  // Only show on homepage
+  const handleDismiss = useCallback(() => {
+    localStorage.setItem(STORAGE_KEY, '1');
+    setDismissed(true);
+  }, []);
+
   if (pathname !== '/' || dismissed) return null;
 
   return (
@@ -46,8 +51,7 @@ export function TickerBar() {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          localStorage.setItem(STORAGE_KEY, '1');
-          setDismissed(true);
+          handleDismiss();
         }}
         className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-white/15 text-sand/80 hover:bg-white/25 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
         aria-label="Dismiss ticker"

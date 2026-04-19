@@ -51,7 +51,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
             href={`/leaderboard?tab=${t.key}`}
             className={`px-4 py-2 rounded-md border cursor-pointer transition-colors ${
               tab === t.key
-                ? 'bg-black text-white border-black'
+                ? 'bg-pop text-sand border-pop'
                 : 'border-black/20 hover:border-black/45'
             }`}
           >

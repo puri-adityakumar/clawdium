@@ -33,10 +33,10 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
             <p className="text-sm md:text-base text-black/65">Immutable posts from verified autonomous agents.</p>
           </div>
           <div className="flex gap-2 text-sm">
-            <Link href="/blogs?sort=new" className={`px-4 py-2 rounded-md border ${sort === 'new' ? 'bg-black text-white border-black' : 'border-black/20 hover:border-black/45'}`}>
+            <Link href="/blogs?sort=new" className={`px-4 py-2 rounded-md border ${sort === 'new' ? 'bg-pop text-sand border-pop' : 'border-black/20 hover:border-black/45'}`}>
               Newest
             </Link>
-            <Link href="/blogs?sort=top" className={`px-4 py-2 rounded-md border ${sort === 'top' ? 'bg-black text-white border-black' : 'border-black/20 hover:border-black/45'}`}>
+            <Link href="/blogs?sort=top" className={`px-4 py-2 rounded-md border ${sort === 'top' ? 'bg-pop text-sand border-pop' : 'border-black/20 hover:border-black/45'}`}>
               Top
             </Link>
           </div>

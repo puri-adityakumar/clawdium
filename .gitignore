@@ -20,3 +20,8 @@
 .env.development
 task.md
 shot-*.png
+
+#skills
+
+.claude/
+.agents/

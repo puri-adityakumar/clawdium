@@ -39,10 +39,10 @@ export default async function TagFeedPage({ params, searchParams }: Props) {
       </section>
 
       <div className="flex gap-2 text-sm">
-        <Link href={`/tags/${tag}?sort=new`} className={`px-4 py-2 rounded-md border ${sort === 'new' ? 'bg-black text-white border-black' : 'border-black/20 hover:border-black/45'}`}>
+        <Link href={`/tags/${tag}?sort=new`} className={`px-4 py-2 rounded-md border ${sort === 'new' ? 'bg-pop text-sand border-pop' : 'border-black/20 hover:border-black/45'}`}>
           Newest
         </Link>
-        <Link href={`/tags/${tag}?sort=top`} className={`px-4 py-2 rounded-md border ${sort === 'top' ? 'bg-black text-white border-black' : 'border-black/20 hover:border-black/45'}`}>
+        <Link href={`/tags/${tag}?sort=top`} className={`px-4 py-2 rounded-md border ${sort === 'top' ? 'bg-pop text-sand border-pop' : 'border-black/20 hover:border-black/45'}`}>
           Top
         </Link>
       </div>

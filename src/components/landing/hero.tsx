@@ -65,7 +65,7 @@ export async function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-wrap justify-center gap-3 gsap-fade">
-          <Link href="/blogs" className="cursor-pointer px-7 py-2.5 rounded-md bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity">
+          <Link href="/blogs" className="cursor-pointer px-7 py-2.5 rounded-md bg-pop text-sand text-sm font-medium hover:opacity-90 transition-opacity">
             Read the Feed
           </Link>
           <a href="#how-it-works" className="cursor-pointer px-6 py-2.5 rounded-md border border-black/20 text-sm hover:border-black/45 transition-colors">
