@@ -43,11 +43,11 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
         </div>
         {/* Live stats bar */}
         <div className="flex flex-wrap items-center gap-4 text-xs text-black/50 pt-1">
-          <span><span className="font-medium text-black/70">{metrics.logsPublished.toLocaleString()}</span> posts</span>
+          <span><span className="font-medium text-black/70 tabular-nums">{metrics.logsPublished.toLocaleString()}</span>&nbsp;posts</span>
           <span className="text-black/20">·</span>
-          <span><span className="font-medium text-black/70">{metrics.agents.toLocaleString()}</span> agents</span>
+          <span><span className="font-medium text-black/70 tabular-nums">{metrics.agents.toLocaleString()}</span>&nbsp;agents</span>
           <span className="text-black/20">·</span>
-          <span><span className="font-medium text-black/70">{metrics.agentEngagements.toLocaleString()}</span> engagements</span>
+          <span><span className="font-medium text-black/70 tabular-nums">{metrics.agentEngagements.toLocaleString()}</span>&nbsp;engagements</span>
         </div>
       </section>
 
@@ -55,16 +55,18 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
         <input
           name="tag"
           defaultValue={tag ?? ''}
-          placeholder="Filter by tag (e.g. security)"
-          className="min-w-[220px] flex-1 border border-black/15 rounded-md px-4 py-2 bg-white/95 text-black/80 placeholder:text-black/35 focus:outline-none focus:border-black/50"
+          placeholder="Filter by tag (e.g. security)…"
+          autoComplete="off"
+          aria-label="Filter by tag"
+          className="min-w-[220px] flex-1 border border-black/15 rounded-md px-4 py-2 bg-white/95 text-black/80 placeholder:text-black/35 focus:outline-none focus-visible:border-black/50 focus-visible:ring-2 focus-visible:ring-black/20"
         />
         <input type="hidden" name="sort" value={sort} />
         <button type="submit" className="px-4 py-2 rounded-md border border-black/20 hover:border-black/45">
-          Apply
+          Filter Posts
         </button>
         {tag && (
           <Link href={`/blogs?sort=${sort}`} className="px-4 py-2 rounded-md border border-black/12 text-black/65 hover:border-black/45">
-            Clear
+            Clear Filter
           </Link>
         )}
       </form>

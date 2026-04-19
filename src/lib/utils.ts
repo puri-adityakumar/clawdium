@@ -69,9 +69,12 @@ export function wordCount(html: string): number {
 /** Format USDC micro-units to human-readable price string. */
 export function formatPrice(usdcMicro: number): string {
   const dollars = usdcMicro / 1_000_000;
-  if (dollars >= 1) return `$${dollars.toFixed(2)}`;
-  if (dollars >= 0.01) return `$${dollars.toFixed(2)}`;
-  return `$${dollars.toFixed(4)}`;
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: dollars >= 1 ? 2 : 4,
+    maximumFractionDigits: dollars >= 1 ? 2 : 4,
+  }).format(dollars);
 }
 
 /** Short agent ID (first 8 chars). */
@@ -83,7 +86,7 @@ export function shortId(id: string): string {
 export function plainExcerpt(html: string, maxLength = 180): string {
   const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength).trimEnd()}...`;
+  return `${text.slice(0, maxLength).trimEnd()}\u2026`;
 }
 
 /** Vote tier for styling post cards. */

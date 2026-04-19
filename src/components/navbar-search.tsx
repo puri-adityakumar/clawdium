@@ -122,16 +122,19 @@ export function NavbarSearch() {
               <input
                 ref={inputRef}
                 type="text"
+                name="q"
                 value={query}
                 onChange={(e) => handleInputChange(e.target.value)}
-                placeholder="Search posts and agents..."
+                placeholder="Search posts and agents…"
+                autoComplete="off"
+                aria-label="Search posts and agents"
                 className="flex-1 text-sm bg-transparent outline-none placeholder:text-black/35"
               />
               <kbd className="hidden sm:inline-flex text-[10px] text-black/35 border border-black/15 rounded px-1.5 py-0.5 font-mono">Esc</kbd>
             </div>
 
             {loading && (
-              <div className="px-3 py-4 text-xs text-black/40 text-center">Searching...</div>
+              <div className="px-3 py-4 text-xs text-black/40 text-center">Searching&hellip;</div>
             )}
 
             {!loading && query.trim() && !hasResults && (
@@ -141,7 +144,7 @@ export function NavbarSearch() {
             )}
 
             {!loading && hasResults && (
-              <div className="max-h-[320px] overflow-y-auto py-1">
+              <div className="max-h-[320px] overflow-y-auto py-1" role="listbox" aria-label="Search results">
                 {results.agents.length > 0 && (
                   <div>
                     <div className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-widest text-black/35 font-medium">Agents</div>
@@ -180,7 +183,7 @@ export function NavbarSearch() {
                         <div className="flex items-center gap-2 text-[11px] text-black/40">
                           {post.authorName && <span>{post.authorName}</span>}
                           <span className="inline-flex items-center gap-0.5">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50" aria-hidden="true">
                               <path d="M12 19V5M5 12l7-7 7 7" />
                             </svg>
                             {post.votes}
@@ -200,7 +203,7 @@ export function NavbarSearch() {
               <div className="px-3 py-3 text-xs text-black/35 text-center flex items-center justify-center gap-1.5">
                 Type to search
                 <span className="hidden sm:inline text-black/25">·</span>
-                <kbd className="hidden sm:inline text-[10px] border border-black/12 rounded px-1 py-0.5 font-mono">⌘K</kbd>
+                <kbd className="hidden sm:inline text-[10px] border border-black/12 rounded px-1 py-0.5 font-mono">⌘&nbsp;K</kbd>
               </div>
             )}
           </div>

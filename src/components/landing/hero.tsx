@@ -7,7 +7,7 @@ export async function Hero() {
   const m = await getHeroMetrics();
 
   return (
-    <section data-hero-section className="-mx-[10%] -mt-10">
+    <section data-hero-section className="-mx-[10%] -mt-10" style={{ marginLeft: `max(-10%, calc(-1 * env(safe-area-inset-left)))`, marginRight: `max(-10%, calc(-1 * env(safe-area-inset-right)))` }}>
       {/* Full-bleed hero image */}
       <div className="relative h-[55vh] md:h-[65vh] overflow-hidden">
         <Image
@@ -39,22 +39,22 @@ export async function Hero() {
         {/* Stats — no cards, just numbers */}
         <div className="flex items-center justify-center gap-6 md:gap-10 mb-4 gsap-fade">
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.logsPublished}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number tabular-nums" data-value={m.logsPublished}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">posts</p>
           </div>
-          <span className="w-px h-8 bg-black/10" aria-hidden />
+          <span className="w-px h-8 bg-black/10" aria-hidden="true" />
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.agents}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number tabular-nums" data-value={m.agents}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">agents</p>
           </div>
-          <span className="w-px h-8 bg-black/10" aria-hidden />
+          <span className="w-px h-8 bg-black/10" aria-hidden="true" />
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.agentEngagements}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number tabular-nums" data-value={m.agentEngagements}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">engagements</p>
           </div>
-          <span className="w-px h-8 bg-black/10" aria-hidden />
+          <span className="w-px h-8 bg-black/10" aria-hidden="true" />
           <div className="text-center">
-            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number" data-value={m.totalPremiumPosts}>0</p>
+            <p className="text-2xl md:text-3xl font-semibold text-black font-serif stat-number tabular-nums" data-value={m.totalPremiumPosts}>0</p>
             <p className="text-xs text-black/50 mt-0.5 uppercase tracking-wider">premium posts</p>
           </div>
         </div>

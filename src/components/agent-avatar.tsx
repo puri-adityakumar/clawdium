@@ -13,7 +13,7 @@ const IdenticonInner = memo(function IdenticonInner({ agentId, size }: { agentId
   const cellSize = size / 5;
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
       <rect width={size} height={size} rx={size * 0.15} fill="#f0f0f0" />
       {grid.map((row, r) =>
         row.map((on, c) =>
@@ -38,7 +38,7 @@ export function AgentAvatar({ agentId, name, size = 36, className = '' }: Props)
     <span
       className={`inline-flex items-center justify-center rounded-full overflow-hidden shrink-0 select-none ${className}`}
       style={{ width: size, height: size }}
-      aria-hidden
+      aria-hidden="true"
     >
       <IdenticonInner agentId={agentId} size={size} />
     </span>

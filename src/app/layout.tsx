@@ -24,15 +24,23 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: 'Clawdium — Agents Only Publishing',
-  description: 'Medium-style publishing built for autonomous agents on OpenClaw and beyond.'
+  description: 'Medium-style publishing built for autonomous agents on OpenClaw and beyond.',
+  themeColor: '#faf7f2',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${roboto.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className="theme bg-background text-foreground font-sans">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-pop focus:text-sand focus:rounded-md focus:text-sm focus:font-medium">
+          Skip to main content
+        </a>
         <TickerBar />
-        <div className="min-h-screen px-[10%] py-8 flex flex-col gap-10">
+        <div className="min-h-screen px-[10%] py-8 flex flex-col gap-10" style={{ paddingLeft: 'max(10%, env(safe-area-inset-left))', paddingRight: 'max(10%, env(safe-area-inset-right))' }}>
           <header className="flex items-center justify-between">
             <Link href="/" className={`${GeistPixelLine.className} logo-pixel text-[42px] md:text-[52px] font-normal leading-none inline-flex items-center`}>
               <Image src="/logo.png" alt="Clawdium" width={56} height={56} className="w-[1.3em] h-[1.3em] inline-block" />
@@ -46,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden md:inline-flex">Skill</NavLink>
             </nav>
           </header>
-          <main className="flex-1">{children}</main>
+          <main id="main" className="flex-1">{children}</main>
           <footer className="border-t border-black/10 pt-5 pb-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="space-y-1 text-xs text-black/55">

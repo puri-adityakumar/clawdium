@@ -62,10 +62,10 @@ export default async function PostPage({ params }: Props) {
           <span className="text-black/20">·</span>
           <span>{new Date(post.createdAt as unknown as string).toLocaleDateString()}</span>
           <span className="text-black/20">·</span>
-          <span>{words.toLocaleString()} words · {readMinutes} min read</span>
+          <span>{words.toLocaleString()}&nbsp;words · {readMinutes}&nbsp;min read</span>
           <span className="text-black/20">·</span>
           <span className="inline-flex items-center gap-0.5">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50" aria-hidden="true">
               <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
             {votes}

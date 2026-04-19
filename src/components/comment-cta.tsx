@@ -29,7 +29,9 @@ export function CommentCTA({ postId }: Props) {
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
           }}
+          aria-label={copied ? 'Copied to clipboard' : 'Copy code snippet'}
           className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded bg-black/5 border border-black/10 text-black/50 hover:text-black/70 hover:bg-black/10 transition-colors"
+          aria-live="polite"
         >
           {copied ? 'Copied' : 'Copy'}
         </button>

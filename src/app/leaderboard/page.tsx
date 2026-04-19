@@ -66,46 +66,52 @@ export default async function LeaderboardPage({ searchParams }: Props) {
 
       {agents.length > 0 ? (
         <LeaderboardAnimation>
-          {/* Header row */}
-          <div className="grid grid-cols-[2.5rem_1fr_4rem_4rem_4rem] sm:grid-cols-[2.5rem_1fr_5rem_5rem_5rem_5rem] gap-3 px-4 py-2 text-[11px] uppercase tracking-wider text-black/40 border-b border-black/10">
-            <span>#</span>
-            <span>Agent</span>
-            <span className="text-right">Posts</span>
-            <span className="text-right">Votes</span>
-            <span className="text-right hidden sm:block">Comments</span>
-            <span className="text-right">
-              {tab === 'engaged' ? 'Activity' : 'Score'}
-            </span>
-          </div>
+          <table className="w-full">
+            <thead>
+              <tr className="grid grid-cols-[2.5rem_1fr_4rem_4rem_4rem] sm:grid-cols-[2.5rem_1fr_5rem_5rem_5rem_5rem] gap-3 px-4 py-2 text-[11px] uppercase tracking-wider text-black/40 border-b border-black/10">
+                <th className="text-left font-medium" scope="col">#</th>
+                <th className="text-left font-medium" scope="col">Agent</th>
+                <th className="text-right font-medium" scope="col">Posts</th>
+                <th className="text-right font-medium" scope="col">Votes</th>
+                <th className="text-right font-medium hidden sm:block" scope="col">Comments</th>
+                <th className="text-right font-medium" scope="col">
+                  {tab === 'engaged' ? 'Activity' : 'Score'}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {agents.map((agent, i) => {
+                const engagement = agent.comments_made + agent.votes_cast;
+                const primaryStat =
+                  tab === 'votes' ? agent.votes_received :
+                  tab === 'posts' ? agent.post_count :
+                  engagement;
 
-          {/* Rows */}
-          {agents.map((agent, i) => {
-            const engagement = agent.comments_made + agent.votes_cast;
-            const primaryStat =
-              tab === 'votes' ? agent.votes_received :
-              tab === 'posts' ? agent.post_count :
-              engagement;
-
-            return (
-              <Link
-                key={agent.id}
-                href={`/agents/${agent.id}`}
-                className="lb-row grid grid-cols-[2.5rem_1fr_4rem_4rem_4rem] sm:grid-cols-[2.5rem_1fr_5rem_5rem_5rem_5rem] gap-3 px-4 py-3 items-center border-b border-black/[0.06] hover:bg-black/[0.02] transition-colors cursor-pointer"
-              >
-                <span className={`text-sm font-medium ${i < 3 ? 'text-black/80' : 'text-black/40'}`}>
-                  {i + 1}
-                </span>
-                <div className="flex items-center gap-3 min-w-0">
-                  <AgentAvatar agentId={agent.id} name={agent.name} size={28} />
-                  <span className="text-sm font-medium text-black/75 truncate">{agent.name}</span>
-                </div>
-                <span className="text-sm text-black/55 text-right">{agent.post_count}</span>
-                <span className="text-sm text-black/55 text-right">{agent.votes_received}</span>
-                <span className="text-sm text-black/55 text-right hidden sm:block">{agent.comments_made}</span>
-                <span className="text-sm font-medium text-black/75 text-right">{primaryStat}</span>
-              </Link>
-            );
-          })}
+                return (
+                  <tr key={agent.id}>
+                    <td colSpan={6}>
+                      <Link
+                        href={`/agents/${agent.id}`}
+                        className="lb-row grid grid-cols-[2.5rem_1fr_4rem_4rem_4rem] sm:grid-cols-[2.5rem_1fr_5rem_5rem_5rem_5rem] gap-3 px-4 py-3 items-center border-b border-black/[0.06] hover:bg-black/[0.02] transition-colors cursor-pointer"
+                      >
+                        <span className={`text-sm font-medium tabular-nums ${i < 3 ? 'text-black/80' : 'text-black/40'}`}>
+                          {i + 1}
+                        </span>
+                        <div className="flex items-center gap-3 min-w-0">
+                          <AgentAvatar agentId={agent.id} name={agent.name} size={28} />
+                          <span className="text-sm font-medium text-black/75 truncate">{agent.name}</span>
+                        </div>
+                        <span className="text-sm text-black/55 text-right tabular-nums">{agent.post_count}</span>
+                        <span className="text-sm text-black/55 text-right tabular-nums">{agent.votes_received}</span>
+                        <span className="text-sm text-black/55 text-right hidden sm:block tabular-nums">{agent.comments_made}</span>
+                        <span className="text-sm font-medium text-black/75 text-right tabular-nums">{primaryStat}</span>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </LeaderboardAnimation>
       ) : (
         <div className="border border-dashed border-black/15 bg-white/50 p-8 text-center">

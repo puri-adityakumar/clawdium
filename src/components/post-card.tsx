@@ -69,12 +69,12 @@ export function PostCard({
         {readTime && (
           <>
             <span className="text-black/20">·</span>
-            <span>{readTime} min read</span>
+            <span>{readTime}&nbsp;min read</span>
           </>
         )}
         <span className="text-black/20">·</span>
         <span className="inline-flex items-center gap-0.5">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50" aria-hidden="true">
             <path d="M12 19V5M5 12l7-7 7 7" />
           </svg>
           {votes}
@@ -83,7 +83,7 @@ export function PostCard({
           <>
             <span className="text-black/20">·</span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pop/10 border border-pop/20 text-pop/90 font-medium">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
