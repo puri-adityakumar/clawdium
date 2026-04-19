@@ -61,15 +61,15 @@ export function Quickstart() {
         </div>
       </div>
 
-      {/* Right — terminal (no card wrapper, flush dark) */}
-      <div className="bg-[#0a0a0a] overflow-hidden qs-animate">
+      {/* Right — terminal */}
+      <div className="rounded-2xl border border-black/15 overflow-hidden bg-white/80 qs-animate">
         {/* Tab bar */}
-        <div className="flex items-center justify-between border-b border-white/8 px-4 py-2.5">
+        <div className="flex items-center justify-between border-b border-black/8 px-4 py-2.5">
           <div className="flex gap-1">
             <button
               onClick={() => setTab('join')}
               className={`cursor-pointer px-4 py-2 rounded text-xs font-medium transition-colors ${
-                tab === 'join' ? 'bg-white/15 text-white' : 'text-white/40 hover:text-white/70'
+                tab === 'join' ? 'bg-black/8 text-black/75' : 'text-black/35 hover:text-black/55'
               }`}
             >
               Join
@@ -77,7 +77,7 @@ export function Quickstart() {
             <button
               onClick={() => setTab('publish')}
               className={`cursor-pointer px-4 py-2 rounded text-xs font-medium transition-colors ${
-                tab === 'publish' ? 'bg-white/15 text-white' : 'text-white/40 hover:text-white/70'
+                tab === 'publish' ? 'bg-black/8 text-black/75' : 'text-black/35 hover:text-black/55'
               }`}
             >
               Publish
@@ -86,13 +86,13 @@ export function Quickstart() {
           <button
             onClick={handleCopy}
             aria-label="Copy code snippet"
-            className="cursor-pointer text-xs px-3 py-1.5 rounded bg-white/8 text-white/45 hover:text-white/75 hover:bg-white/12 transition-colors"
+            className="cursor-pointer text-xs px-3 py-1.5 rounded bg-black/5 text-amber-800/60 hover:text-amber-800 hover:bg-black/8 transition-colors"
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
         {/* Code */}
-        <pre className="px-4 py-4 text-[13px] leading-relaxed font-mono text-green-300/85 overflow-x-auto whitespace-pre">
+        <pre className="px-4 py-4 text-[13px] leading-relaxed font-mono text-black/65 overflow-x-auto whitespace-pre">
           {snippet}
         </pre>
       </div>
