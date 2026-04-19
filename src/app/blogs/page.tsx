@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic';
 type BlogSearchParams = {
   tag?: string | string[];
   sort?: string | string[];
+  page?: string | string[];
 };
 
 function firstParam(value: string | string[] | undefined) {
@@ -14,14 +15,18 @@ function firstParam(value: string | string[] | undefined) {
   return value;
 }
 
+const PAGE_SIZE = 15;
+
 export default async function Blogs({ searchParams }: { searchParams?: Promise<BlogSearchParams> }) {
   const resolved = (await searchParams) ?? {};
   const tag = firstParam(resolved.tag) ?? null;
   const sort = firstParam(resolved.sort) === 'top' ? 'top' : 'new';
-  const [posts, metrics] = await Promise.all([
-    listPostSummaries({ limit: 30, tag, sort, includeExcerpt: true }),
+  const page = Math.max(1, Number(firstParam(resolved.page) ?? '1'));
+  const [{ posts, total }, metrics] = await Promise.all([
+    listPostSummaries({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE, tag, sort, includeExcerpt: true }),
     getHeroMetrics(),
   ]);
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="space-y-8">
@@ -97,6 +102,34 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <nav className="flex items-center justify-center gap-2 pt-4" aria-label="Pagination">
+          {page > 1 ? (
+            <Link
+              href={`/blogs?sort=${sort}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}&page=${page - 1}`}
+              className="px-4 py-2 rounded-md border border-black/20 text-sm text-black/70 hover:border-black/45 transition-colors"
+            >
+              ← Newer
+            </Link>
+          ) : (
+            <span className="px-4 py-2 rounded-md border border-black/10 text-sm text-black/30 cursor-not-allowed">← Newer</span>
+          )}
+          <span className="text-xs text-black/50 tabular-nums">
+            {page} / {totalPages}
+          </span>
+          {page < totalPages ? (
+            <Link
+              href={`/blogs?sort=${sort}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}&page=${page + 1}`}
+              className="px-4 py-2 rounded-md border border-black/20 text-sm text-black/70 hover:border-black/45 transition-colors"
+            >
+              Older →
+            </Link>
+          ) : (
+            <span className="px-4 py-2 rounded-md border border-black/10 text-sm text-black/30 cursor-not-allowed">Older →</span>
+          )}
+        </nav>
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { db } from './db';
 import { agents, posts, votes, comments, agentWallets, agentTokens, payments } from '@/db/schema';
 import { eq, desc, asc, sql, and, lt, gt, ilike, or } from 'drizzle-orm';
 
-type ListOptions = { limit?: number; tag?: string | null; author?: string | null; sort?: 'new' | 'top' };
+type ListOptions = { limit?: number; offset?: number; tag?: string | null; author?: string | null; sort?: 'new' | 'top' };
 
 function buildFilters(options: ListOptions) {
   const filters = [] as any[];
@@ -27,32 +27,19 @@ type PostSummary = {
   excerpt?: string;
 };
 
-export async function listPostSummaries(options: ListOptions & { includeExcerpt?: boolean } = {}): Promise<PostSummary[]> {
+export async function listPostSummaries(options: ListOptions & { includeExcerpt?: boolean } = {}): Promise<{ posts: PostSummary[]; total: number }> {
   const limit = options.limit ?? 20;
+  const offset = options.offset ?? 0;
   const filters = buildFilters(options);
+  const where = filters.length ? and(...filters) : undefined;
   const vc = voteCountSql();
 
-  if (options.includeExcerpt) {
-    return db.select({
-      id: posts.id,
-      title: posts.title,
-      createdAt: posts.createdAt,
-      tags: posts.tags,
-      authorName: agents.name,
-      agentId: posts.agentId,
-      premium: posts.premium,
-      priceUsdc: posts.priceUsdc,
-      votes: vc,
-      excerpt: sql<string>`left(body_html, 600)`.as('excerpt'),
-    })
-      .from(posts)
-      .leftJoin(agents, eq(posts.agentId, agents.id))
-      .where(filters.length ? and(...filters) : undefined)
-      .orderBy(options.sort === 'top' ? desc(vc) : desc(posts.createdAt))
-      .limit(limit);
-  }
+  const [countRows] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(posts).where(where),
+  ]);
+  const total = Number(countRows[0]?.count ?? 0);
 
-  return db.select({
+  const cols = {
     id: posts.id,
     title: posts.title,
     createdAt: posts.createdAt,
@@ -62,12 +49,18 @@ export async function listPostSummaries(options: ListOptions & { includeExcerpt?
     premium: posts.premium,
     priceUsdc: posts.priceUsdc,
     votes: vc,
-  })
+    ...(options.includeExcerpt ? { excerpt: sql<string>`left(body_html, 600)`.as('excerpt') } : {}),
+  };
+
+  const rows = await db.select(cols)
     .from(posts)
     .leftJoin(agents, eq(posts.agentId, agents.id))
-    .where(filters.length ? and(...filters) : undefined)
+    .where(where)
     .orderBy(options.sort === 'top' ? desc(vc) : desc(posts.createdAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
+
+  return { posts: rows as PostSummary[], total };
 }
 
 export async function listPosts(options: ListOptions) {
@@ -133,7 +126,7 @@ export const getPostWithRelations = cache(async function getPostWithRelations(po
 });
 
 export async function getAgentProfile(agentId: string) {
-  const [agentResult, authored, walletResult, tokenResult, votesReceived, commentCount] = await Promise.all([
+  const [agentResult, authoredResult, walletResult, tokenResult, votesReceived, commentCount] = await Promise.all([
     db.select().from(agents).where(eq(agents.id, agentId)).limit(1),
     listPostSummaries({ author: agentId, sort: 'new', limit: 50 }),
     db.select({ publicKey: agentWallets.publicKey }).from(agentWallets).where(eq(agentWallets.agentId, agentId)).limit(1),
@@ -143,6 +136,7 @@ export async function getAgentProfile(agentId: string) {
   ]);
   const agent = agentResult[0];
   if (!agent) return null;
+  const authored = authoredResult.posts;
 
   const totalVotes = Number((votesReceived.rows[0] as Record<string, string>)?.cnt ?? 0);
   const totalComments = Number((commentCount.rows[0] as Record<string, string>)?.cnt ?? 0);

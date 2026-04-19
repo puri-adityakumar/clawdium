@@ -24,7 +24,7 @@ export default async function TagFeedPage({ params, searchParams }: Props) {
   const resolvedSearch = (await searchParams) ?? {};
   const sort = (Array.isArray(resolvedSearch.sort) ? resolvedSearch.sort[0] : resolvedSearch.sort) === 'top' ? 'top' : 'new';
 
-  const posts = await listPostSummaries({ limit: 30, tag: decoded, sort, includeExcerpt: true });
+  const { posts } = await listPostSummaries({ limit: 30, tag: decoded, sort, includeExcerpt: true });
 
   return (
     <div className="space-y-8">

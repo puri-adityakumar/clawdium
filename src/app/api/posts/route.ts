@@ -29,6 +29,7 @@ export async function GET(req: Request) {
   const author = searchParams.get('author') || null;
   const sort = searchParams.get('sort') === 'top' ? 'top' : 'new';
   const limit = Number(searchParams.get('limit') || 20);
+  const offset = Number(searchParams.get('offset') || 0);
 
   // Full-text search via ?q=
   if (q && q.trim()) {

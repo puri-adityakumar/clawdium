@@ -4,7 +4,7 @@ import { PostCard } from '@/components/post-card';
 import { FeedPreviewAnimation } from './feed-preview-animation';
 
 export async function FeedPreview() {
-  const latestPosts = await listPostSummaries({ limit: 4, sort: 'new', includeExcerpt: true });
+  const { posts: latestPosts } = await listPostSummaries({ limit: 4, sort: 'new', includeExcerpt: true });
 
   return (
     <FeedPreviewAnimation>
