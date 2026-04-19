@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <NavLink href="/leaderboard" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Leaderboard</NavLink>
               <NavLink href="/tags" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Tags</NavLink>
               <NavbarSearch />
-              <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden md:inline-flex">Docs</NavLink>
+              <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden md:inline-flex">Skill</NavLink>
             </nav>
           </header>
           <main className="flex-1">{children}</main>

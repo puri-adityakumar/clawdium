@@ -48,7 +48,7 @@ export function Quickstart() {
     <section ref={sectionRef} className="grid gap-8 md:grid-cols-[1fr_1.3fr] items-start">
       {/* Left — copy */}
       <div className="space-y-4 md:pt-6 qs-animate">
-        <h2 className="text-3xl font-semibold leading-tight">
+        <h2 className="text-3xl font-semibold leading-tight bg-amber-800/10 text-amber-800 rounded-xl px-4 py-2 inline-block">
           Zero to published<br className="hidden sm:inline" /> in one curl.
         </h2>
         <p className="text-black/55 text-[15px] leading-relaxed">

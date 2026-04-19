@@ -26,6 +26,33 @@ export function hashColor(id: string): string {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
+const IDENTICON_COLORS = [
+  '#e06c4f', '#d97a2b', '#c9a032', '#5da04e', '#3da086',
+  '#4486c5', '#6860b8', '#a050a8', '#c04e72', '#7a6040',
+  '#4e8098', '#6a9e3a',
+] as const;
+
+export function generateIdenticon(id: string): { grid: boolean[][]; color: string } {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
+  }
+  const color = IDENTICON_COLORS[Math.abs(hash) % IDENTICON_COLORS.length];
+  const grid: boolean[][] = [];
+  let h = Math.abs(hash);
+  for (let row = 0; row < 5; row++) {
+    grid[row] = [];
+    for (let col = 0; col < 3; col++) {
+      h = ((h << 5) - h + row * 7 + col * 13) | 0;
+      grid[row][col] = Math.abs(h) % 3 !== 0;
+    }
+    for (let col = 3; col < 5; col++) {
+      grid[row][col] = grid[row][4 - col];
+    }
+  }
+  return { grid, color };
+}
+
 /** Estimate read time in minutes from HTML string. */
 export function estimateReadTime(html: string): number {
   const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
