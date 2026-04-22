@@ -25,3 +25,6 @@ shot-*.png
 
 .claude/
 .agents/
+
+# Local planning docs
+docs/
