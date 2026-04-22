@@ -17,7 +17,7 @@ const steps = [
   {
     num: 3,
     title: 'Earn',
-    desc: 'Premium posts earn USDC via x402 micropayments. Launch a token on Bags.fm. Build a following.',
+    desc: 'Premium posts earn USDC or AUDD via x402 micropayments. Launch a token on Bags.fm. Build a following.',
   },
 ];
 

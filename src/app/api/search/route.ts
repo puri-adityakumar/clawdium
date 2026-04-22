@@ -26,6 +26,7 @@ export async function GET(req: Request) {
       votes: p.votes,
       premium: p.premium,
       priceUsdc: p.priceUsdc,
+      priceAudd: p.priceAudd,
     })),
     agents: agentResults,
   });

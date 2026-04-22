@@ -6,6 +6,7 @@ const SKILLS_READS_KEY = 'skills_reads';
 const AGENT_API_CALLS_KEY = 'agent_api_calls';
 const TOTAL_PAYMENTS_KEY = 'total_payments';
 const TOTAL_REVENUE_USDC_KEY = 'total_revenue_usdc';
+const TOTAL_REVENUE_AUDD_KEY = 'total_revenue_audd';
 const TOTAL_TOKEN_LAUNCHES_KEY = 'total_token_launches';
 const TOTAL_PREMIUM_POSTS_KEY = 'total_premium_posts';
 
@@ -93,7 +94,20 @@ export async function incrementRevenueUsdc(amount: number) {
         set: { value: sql`${siteMetrics.value} + ${amount}`, updatedAt: sql`now()` }
       });
   } catch (error) {
-    console.warn('Unable to increment revenue', error);
+    console.warn('Unable to increment USDC revenue', error);
+  }
+}
+
+export async function incrementRevenueAudd(amount: number) {
+  try {
+    await db.insert(siteMetrics)
+      .values({ key: TOTAL_REVENUE_AUDD_KEY, value: amount })
+      .onConflictDoUpdate({
+        target: siteMetrics.key,
+        set: { value: sql`${siteMetrics.value} + ${amount}`, updatedAt: sql`now()` }
+      });
+  } catch (error) {
+    console.warn('Unable to increment AUDD revenue', error);
   }
 }
 
@@ -125,7 +139,7 @@ export async function incrementPremiumPosts() {
 
 export async function getEconomicMetrics() {
   try {
-    const keys = [TOTAL_PAYMENTS_KEY, TOTAL_REVENUE_USDC_KEY, TOTAL_TOKEN_LAUNCHES_KEY, TOTAL_PREMIUM_POSTS_KEY];
+    const keys = [TOTAL_PAYMENTS_KEY, TOTAL_REVENUE_USDC_KEY, TOTAL_REVENUE_AUDD_KEY, TOTAL_TOKEN_LAUNCHES_KEY, TOTAL_PREMIUM_POSTS_KEY];
     const rows = await db
       .select({ key: siteMetrics.key, value: siteMetrics.value })
       .from(siteMetrics)
@@ -135,11 +149,12 @@ export async function getEconomicMetrics() {
     return {
       totalPayments: Number(map[TOTAL_PAYMENTS_KEY] ?? 0),
       totalRevenueUsdc: Number(map[TOTAL_REVENUE_USDC_KEY] ?? 0),
+      totalRevenueAudd: Number(map[TOTAL_REVENUE_AUDD_KEY] ?? 0),
       totalTokenLaunches: Number(map[TOTAL_TOKEN_LAUNCHES_KEY] ?? 0),
       totalPremiumPosts: Number(map[TOTAL_PREMIUM_POSTS_KEY] ?? 0)
     };
   } catch (error) {
     console.warn('Unable to fetch economic metrics', error);
-    return { totalPayments: 0, totalRevenueUsdc: 0, totalTokenLaunches: 0, totalPremiumPosts: 0 };
+    return { totalPayments: 0, totalRevenueUsdc: 0, totalRevenueAudd: 0, totalTokenLaunches: 0, totalPremiumPosts: 0 };
   }
 }

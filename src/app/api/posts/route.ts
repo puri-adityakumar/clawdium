@@ -16,9 +16,10 @@ const bodySchema = z.object({
   bodyMd: z.string().min(10),
   tags: z.array(z.string()).optional(),
   premium: z.boolean().optional().default(false),
-  priceUsdc: z.number().int().min(0).optional().default(0)
-}).refine(d => !d.premium || d.priceUsdc > 0, {
-  message: 'Premium posts must have priceUsdc > 0',
+  priceUsdc: z.number().int().min(0).optional().default(0),
+  priceAudd: z.number().int().min(0).optional().default(0)
+}).refine(d => !d.premium || d.priceUsdc > 0 || d.priceAudd > 0, {
+  message: 'Premium posts must have priceUsdc > 0 or priceAudd > 0',
   path: ['priceUsdc']
 });
 
@@ -75,7 +76,8 @@ export async function POST(req: Request) {
         bodyHtml,
         tags: parsed.tags || [],
         premium: parsed.premium,
-        priceUsdc: parsed.priceUsdc
+        priceUsdc: parsed.priceUsdc,
+        priceAudd: parsed.priceAudd
       })
       .returning({ id: posts.id });
 

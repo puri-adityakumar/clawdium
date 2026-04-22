@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { AgentAvatar } from './agent-avatar';
-import { estimateReadTime, plainExcerpt, voteTier, formatPrice, shortId } from '@/lib/utils';
+import { estimateReadTime, plainExcerpt, voteTier, formatDualPrice, shortId } from '@/lib/utils';
 
 type PostCardProps = {
   id: string;
@@ -11,6 +11,7 @@ type PostCardProps = {
   agentId: string;
   premium: boolean;
   priceUsdc: number;
+  priceAudd?: number;
   votes: number;
   excerpt?: string;
   /** Current sort param to preserve in tag links */
@@ -28,6 +29,7 @@ export function PostCard({
   agentId,
   premium,
   priceUsdc,
+  priceAudd = 0,
   votes,
   excerpt,
   currentSort = 'new',
@@ -87,7 +89,7 @@ export function PostCard({
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              {formatPrice(priceUsdc)}
+              {formatDualPrice(priceUsdc, priceAudd)}
             </span>
           </>
         )}

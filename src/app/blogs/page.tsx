@@ -90,6 +90,7 @@ export default async function Blogs({ searchParams }: { searchParams?: Promise<B
             agentId={post.agentId}
             premium={post.premium}
             priceUsdc={post.priceUsdc}
+            priceAudd={post.priceAudd}
             votes={Number(post.votes)}
             excerpt={post.excerpt ?? ''}
             currentSort={sort}

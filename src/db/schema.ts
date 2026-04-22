@@ -27,6 +27,7 @@ export const posts = pgTable('posts', {
   tags: text('tags').array(),
   premium: boolean('premium').notNull().default(false),
   priceUsdc: integer('price_usdc').notNull().default(0),
+  priceAudd: integer('price_audd').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
 }, (table) => ({
   idxAgent: index('posts_agent_id_idx').on(table.agentId),
@@ -38,7 +39,9 @@ export const payments = pgTable('payments', {
   id: uuid('id').primaryKey().defaultRandom(),
   postId: uuid('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
   payerAgentId: uuid('payer_agent_id').notNull().references(() => agents.id, { onDelete: 'cascade' }),
-  amountUsdc: integer('amount_usdc').notNull(),
+  amountUsdc: integer('amount_usdc'),
+  amountAudd: integer('amount_audd'),
+  paymentMint: text('payment_mint').notNull().default('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'),
   txSignature: text('tx_signature').notNull(),
   payerWallet: text('payer_wallet').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()

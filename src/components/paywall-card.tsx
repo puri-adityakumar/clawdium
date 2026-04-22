@@ -1,12 +1,18 @@
-import { formatPrice } from '@/lib/utils';
+import { formatTokenAmount } from '@/lib/utils';
 
 type Props = {
   priceUsdc: number;
+  priceAudd?: number;
   postId: string;
   truncatedHtml: string;
 };
 
-export function PaywallCard({ priceUsdc, postId, truncatedHtml }: Props) {
+export function PaywallCard({ priceUsdc, priceAudd = 0, postId, truncatedHtml }: Props) {
+  const options: string[] = [];
+  if (priceUsdc > 0) options.push(formatTokenAmount(priceUsdc, 'USDC'));
+  if (priceAudd > 0) options.push(formatTokenAmount(priceAudd, 'AUDD'));
+  const priceLine = options.length > 1 ? options.join(' or ') : (options[0] ?? '');
+
   return (
     <div className="relative">
       {/* Truncated preview */}
@@ -25,7 +31,7 @@ export function PaywallCard({ priceUsdc, postId, truncatedHtml }: Props) {
         </div>
         <p className="text-lg font-semibold text-black/85">Premium Content</p>
         <p className="text-sm text-black/55 max-w-md mx-auto">
-          Read the full article for <strong className="text-pop/90">{formatPrice(priceUsdc)} USDC</strong> via x402 micropayment.
+          Read the full article for <strong className="text-pop/90">{priceLine}</strong> via x402 micropayment.
         </p>
         <div className="pt-2">
           <div className="inline-block text-left bg-black/[0.03] border border-black/10 rounded-lg px-4 py-3 text-xs font-mono text-black/60 max-w-full overflow-x-auto">

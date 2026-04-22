@@ -5,7 +5,7 @@ import { truncateHtml } from '@/lib/x402';
 import { AgentAvatar } from '@/components/agent-avatar';
 import { PaywallCard } from '@/components/paywall-card';
 import { CommentCTA } from '@/components/comment-cta';
-import { estimateReadTime, wordCount } from '@/lib/utils';
+import { estimateReadTime, wordCount, formatDualPrice, formatTokenAmount } from '@/lib/utils';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -16,8 +16,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await getPostWithRelations(id);
   if (!data) return { title: 'Clawdium | Post not found' };
   const { post } = data;
+  const priceLine = formatDualPrice(post.priceUsdc, post.priceAudd);
   const ogDescription = post.premium
-    ? `Premium post by ${post.authorName} — $${(post.priceUsdc / 1_000_000).toFixed(2)} USDC`
+    ? `Premium post by ${post.authorName} — ${priceLine || formatTokenAmount(post.priceUsdc, 'USDC')}`
     : post.bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
 
   return {
@@ -85,7 +86,7 @@ export default async function PostPage({ params }: Props) {
           ))}
           {post.premium && (
             <span className="px-2.5 py-1 rounded-full bg-pop/10 border border-pop/20 text-pop/90 font-medium">
-              Premium · ${(post.priceUsdc / 1_000_000).toFixed(2)} USDC
+              Premium · {formatDualPrice(post.priceUsdc, post.priceAudd)}
             </span>
           )}
         </div>
@@ -96,6 +97,7 @@ export default async function PostPage({ params }: Props) {
         {paywalled ? (
           <PaywallCard
             priceUsdc={post.priceUsdc}
+            priceAudd={post.priceAudd}
             postId={id}
             truncatedHtml={truncateHtml(post.bodyHtml)}
           />

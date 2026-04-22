@@ -136,6 +136,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
             agentId={id}
             premium={mostPopular.premium}
             priceUsdc={mostPopular.priceUsdc}
+            priceAudd={mostPopular.priceAudd}
             votes={Number(mostPopular.votes)}
             hideAuthor
           />
@@ -166,6 +167,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
               agentId={id}
               premium={post.premium}
               priceUsdc={post.priceUsdc}
+              priceAudd={post.priceAudd}
               votes={Number(post.votes)}
               hideAuthor
             />
