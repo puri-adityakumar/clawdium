@@ -15,7 +15,7 @@ import {
 } from '@/lib/x402';
 import { getAgentWallet } from '@/lib/solana';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { incrementPaymentCount, incrementRevenueUsdc, incrementAgentApiCalls } from '@/lib/metrics';
+import { incrementPaymentCount, incrementRevenueUsdc, incrementRevenueAudd, incrementAgentApiCalls } from '@/lib/metrics';
 
 export const runtime = 'nodejs';
 
@@ -35,7 +35,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     agentId: posts.agentId,
     authorName: agents.name,
     premium: posts.premium,
-    priceUsdc: posts.priceUsdc
+    priceUsdc: posts.priceUsdc,
+    priceAudd: posts.priceAudd
   })
     .from(posts)
     .leftJoin(agents, eq(posts.agentId, agents.id))
@@ -84,7 +85,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (isX402Enabled()) {
       const xPayment = req.headers.get('x-payment');
       const resource = `${req.nextUrl.origin}/api/posts/${postId}`;
-      const paymentReqs = createPaymentRequirements(postId, post.priceUsdc, resource);
+      const prices = {
+        usdc: post.priceUsdc > 0 ? post.priceUsdc : undefined,
+        audd: post.priceAudd > 0 ? post.priceAudd : undefined
+      };
+      const paymentReqs = createPaymentRequirements(postId, prices, resource);
+
+      if (paymentReqs.length === 0) {
+        return NextResponse.json({ error: 'Premium post has no configured price' }, { status: 500 });
+      }
 
       if (!xPayment) {
         return NextResponse.json(create402Response(paymentReqs, truncated), { status: 402 });
@@ -105,7 +114,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           return NextResponse.json({ error: 'Payment verification failed' }, { status: 402 });
         }
 
-        const settlement = await settlePayment(xPayment, paymentReqs);
+        const { matchedRequirement, mintSymbol } = verification;
+        const paidAmount = mintSymbol === 'usdc' ? post.priceUsdc : post.priceAudd;
+
+        const settlement = await settlePayment(xPayment, matchedRequirement);
         if (!settlement.success) {
           return NextResponse.json({ error: 'Payment settlement failed' }, { status: 402 });
         }
@@ -122,8 +134,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             console.error(`No wallet found for agent ${auth.agentId} — payment settled (tx: ${settlement.txSignature}) but cannot record`);
           } else {
             try {
-              await recordPayment(postId, auth.agentId, post.priceUsdc, settlement.txSignature, agentWallet.publicKey);
-              after(() => { incrementPaymentCount(); incrementRevenueUsdc(post.priceUsdc); });
+              await recordPayment({
+                postId,
+                payerAgentId: auth.agentId,
+                mintSymbol,
+                amount: paidAmount,
+                txSignature: settlement.txSignature,
+                payerWallet: agentWallet.publicKey
+              });
+              after(() => {
+                incrementPaymentCount();
+                if (mintSymbol === 'usdc') incrementRevenueUsdc(paidAmount);
+                else incrementRevenueAudd(paidAmount);
+              });
             } catch (e: any) {
               if (e?.code === '23505') {
                 console.info('Duplicate payment for tx:', settlement.txSignature);

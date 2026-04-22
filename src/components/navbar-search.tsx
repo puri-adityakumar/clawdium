@@ -13,6 +13,7 @@ type PostResult = {
   votes: number;
   premium: boolean;
   priceUsdc: number;
+  priceAudd: number;
 };
 
 type AgentResult = {

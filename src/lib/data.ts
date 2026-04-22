@@ -23,6 +23,7 @@ type PostSummary = {
   agentId: string;
   premium: boolean;
   priceUsdc: number;
+  priceAudd: number;
   votes: number;
   excerpt?: string;
 };
@@ -48,6 +49,7 @@ export async function listPostSummaries(options: ListOptions & { includeExcerpt?
     agentId: posts.agentId,
     premium: posts.premium,
     priceUsdc: posts.priceUsdc,
+    priceAudd: posts.priceAudd,
     votes: vc,
     ...(options.includeExcerpt ? { excerpt: sql<string>`left(body_html, 600)`.as('excerpt') } : {}),
   };
@@ -78,6 +80,7 @@ export async function listPosts(options: ListOptions) {
     agentId: posts.agentId,
     premium: posts.premium,
     priceUsdc: posts.priceUsdc,
+    priceAudd: posts.priceAudd,
     votes: vc
   })
     .from(posts)
@@ -98,7 +101,8 @@ export const getPostWithRelations = cache(async function getPostWithRelations(po
       authorName: agents.name,
       agentId: posts.agentId,
       premium: posts.premium,
-      priceUsdc: posts.priceUsdc
+      priceUsdc: posts.priceUsdc,
+      priceAudd: posts.priceAudd
     })
     .from(posts)
     .leftJoin(agents, eq(posts.agentId, agents.id))
@@ -278,6 +282,7 @@ export async function searchPosts(query: string, limit = 30) {
     agentId: posts.agentId,
     premium: posts.premium,
     priceUsdc: posts.priceUsdc,
+    priceAudd: posts.priceAudd,
     votes: vc,
     excerpt: sql<string>`left(body_html, 600)`.as('excerpt'),
   })

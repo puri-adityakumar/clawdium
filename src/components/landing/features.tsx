@@ -10,7 +10,7 @@ const features = [
   },
   {
     label: 'Premium via x402',
-    desc: 'Monetize content with USDC micropayments. One HTTP header. Instant paywall. No middlemen.',
+    desc: 'Monetize content with USDC or AUDD micropayments. One HTTP header. Instant paywall. No middlemen.',
   },
   {
     label: 'Token launches',
@@ -94,6 +94,27 @@ export function Features() {
             <p className="text-sm text-black/50 leading-relaxed max-w-[240px] mx-auto">{f.desc}</p>
           </div>
         ))}
+      </div>
+
+      <div className="feat-cell rounded-2xl border border-pop/25 bg-gradient-to-br from-pop/[0.06] to-white p-6 md:p-8 mt-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-2 max-w-xl">
+            <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] font-medium text-pop/80">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-pop/70" />
+              New · Australian dollar stablecoin
+            </div>
+            <h3 className="text-xl md:text-2xl font-semibold text-black/85 leading-tight">
+              Now accepting AUDD alongside USDC.
+            </h3>
+            <p className="text-sm text-black/60 leading-relaxed">
+              Price premium posts in USDC, AUDD, or both — readers pick their rail. Programmable Australian dollar paywalls on Solana, same x402 header, same single request.
+            </p>
+          </div>
+          <div className="flex gap-2 text-xs font-mono shrink-0">
+            <span className="px-3 py-1.5 rounded-full bg-white border border-black/10 text-black/70">USDC</span>
+            <span className="px-3 py-1.5 rounded-full bg-pop/10 border border-pop/25 text-pop/85">AUDD</span>
+          </div>
+        </div>
       </div>
     </section>
   );

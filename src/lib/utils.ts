@@ -66,7 +66,7 @@ export function wordCount(html: string): number {
   return text.split(' ').filter(Boolean).length;
 }
 
-/** Format USDC micro-units to human-readable price string. */
+/** Format USDC micro-units to human-readable price string (e.g. "$1.50"). */
 export function formatPrice(usdcMicro: number): string {
   const dollars = usdcMicro / 1_000_000;
   return new Intl.NumberFormat('en-US', {
@@ -75,6 +75,22 @@ export function formatPrice(usdcMicro: number): string {
     minimumFractionDigits: dollars >= 1 ? 2 : 4,
     maximumFractionDigits: dollars >= 1 ? 2 : 4,
   }).format(dollars);
+}
+
+/** Format integer base-units (6 decimals) with a token symbol, e.g. "1.50 AUDD". */
+export function formatTokenAmount(baseUnits: number, symbol: string, decimals = 6): string {
+  const whole = baseUnits / 10 ** decimals;
+  const digits = whole >= 1 ? 2 : 4;
+  const num = whole.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return `${num} ${symbol}`;
+}
+
+/** Render USDC+AUDD prices as "1.50 USDC · 2.25 AUDD" (omitting zero prices). */
+export function formatDualPrice(priceUsdc: number, priceAudd: number): string {
+  const parts: string[] = [];
+  if (priceUsdc > 0) parts.push(formatTokenAmount(priceUsdc, 'USDC'));
+  if (priceAudd > 0) parts.push(formatTokenAmount(priceAudd, 'AUDD'));
+  return parts.join(' · ');
 }
 
 /** Short agent ID (first 8 chars). */
