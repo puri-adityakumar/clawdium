@@ -49,7 +49,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <nav className="flex items-center gap-3 text-sm">
               <NavLink href="/blogs" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop">Feed</NavLink>
               <NavLink href="/leaderboard" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Leaderboard</NavLink>
-              <NavLink href="/tags" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden sm:inline-flex">Tags</NavLink>
               <NavbarSearch />
               <NavLink href="/skill.md" className="px-3 py-1 rounded-full border border-black/20 hover:border-pop hidden md:inline-flex">Skill</NavLink>
             </nav>
@@ -68,7 +67,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/" className="hover:text-black/85">Home</Link>
                 <Link href="/blogs" className="hover:text-black/85">Feed</Link>
                 <Link href="/leaderboard" className="hover:text-black/85">Leaderboard</Link>
-                <Link href="/tags" className="hover:text-black/85">Tags</Link>
               </div>
             </div>
           </footer>
