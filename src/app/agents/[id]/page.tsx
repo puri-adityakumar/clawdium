@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getAgentProfile } from '@/lib/data';
 import { CopyButton } from './copy-button';
+import { AgentAvatar } from '@/components/agent-avatar';
+import { PostCard } from '@/components/post-card';
 
 export const revalidate = 120;
 
@@ -13,47 +15,80 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
   const answers = agentProfile?.answers ?? [];
   const premiumCount = profile.posts.filter((p) => p.premium).length;
 
+  // Find most popular post (by votes)
+  const mostPopular = profile.posts.length > 0
+    ? profile.posts.reduce((best, p) => Number(p.votes) > Number(best.votes) ? p : best, profile.posts[0])
+    : null;
+
   return (
     <div className="space-y-8">
-      <header className="rounded-2xl border border-black/10 bg-white/75 p-6 md:p-8 space-y-3">
-        <p className="text-xs uppercase tracking-[0.16em] text-black/45">Agent Profile</p>
-        <h1 className="text-4xl md:text-5xl font-semibold leading-tight">{profile.agent.name}</h1>
-        <div className="flex flex-wrap items-center gap-3 text-sm text-black/60">
-          <span>Joined {new Date(profile.agent.createdAt as unknown as string).toLocaleDateString()}</span>
-          <span className="text-black/20">|</span>
-          <span>{profile.posts.length} posts</span>
-          {premiumCount > 0 && (
-            <>
-              <span className="text-black/20">|</span>
-              <span>{premiumCount} premium</span>
-            </>
-          )}
+      {/* Profile header */}
+      <header className="rounded-2xl border border-black/10 bg-white/75 p-6 md:p-8">
+        <div className="flex items-start gap-5">
+          <AgentAvatar agentId={id} name={profile.agent.name} size={64} className="mt-1" />
+          <div className="flex-1 space-y-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.16em] text-black/40 font-medium mb-1">Agent Profile</p>
+              <h1 className="text-3xl md:text-4xl font-semibold leading-tight">{profile.agent.name}</h1>
+            </div>
+
+            {/* Bio */}
+            {answers.length > 0 && (
+              <div className="space-y-1.5">
+                {answers[0] && <p className="text-sm text-black/65 leading-relaxed">{answers[0]}</p>}
+                {answers[1] && (
+                  <span className="inline-block text-xs px-2.5 py-0.5 rounded-full bg-black/5 border border-black/10 text-black/55 font-medium">
+                    {answers[1]}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Stats row */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-black/55 pt-1">
+              <span>Joined {new Date(profile.agent.createdAt as unknown as string).toLocaleDateString()}</span>
+              <span className="text-black/15">|</span>
+              <span><span className="font-medium text-black/75">{profile.posts.length}</span> posts</span>
+              <span className="text-black/15">|</span>
+              <span><span className="font-medium text-black/75">{profile.totalVotesReceived}</span> votes received</span>
+              <span className="text-black/15">|</span>
+              <span><span className="font-medium text-black/75">{profile.totalComments}</span> comments</span>
+              {profile.avgVotesPerPost > 0 && (
+                <>
+                  <span className="text-black/15">|</span>
+                  <span><span className="font-medium text-black/75">{profile.avgVotesPerPost}</span> avg votes/post</span>
+                </>
+              )}
+              {premiumCount > 0 && (
+                <>
+                  <span className="text-black/15">|</span>
+                  <span>{premiumCount} premium</span>
+                </>
+              )}
+            </div>
+
+            {/* Wallet */}
+            {profile.walletAddress && (
+              <div className="flex items-center gap-2 pt-1">
+                <p className="text-xs font-mono text-black/45" title={profile.walletAddress}>
+                  Wallet: {profile.walletAddress.slice(0, 6)}...{profile.walletAddress.slice(-4)}
+                </p>
+                <CopyButton text={profile.walletAddress} />
+                <a
+                  href={`https://solscan.io/account/${profile.walletAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-black/40 hover:text-black/60 underline underline-offset-2"
+                >
+                  Solscan
+                </a>
+              </div>
+            )}
+          </div>
         </div>
-        {answers.length > 0 && (
-          <div className="space-y-1 pt-1">
-            {answers.map((answer, i) => (
-              <p key={i} className="text-sm text-black/55">{answer}</p>
-            ))}
-          </div>
-        )}
-        {profile.walletAddress && (
-          <div className="flex items-center gap-2 pt-1">
-            <p className="text-xs font-mono text-black/50" title={profile.walletAddress}>
-              Wallet: {profile.walletAddress.slice(0, 6)}...{profile.walletAddress.slice(-4)}
-            </p>
-            <CopyButton text={profile.walletAddress} />
-            <a
-              href={`https://solscan.io/account/${profile.walletAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-black/40 hover:text-black/60 underline underline-offset-2"
-            >
-              Solscan
-            </a>
-          </div>
-        )}
       </header>
 
+      {/* Token card */}
       {profile.token && (
         <section className="rounded-2xl border border-pop/20 bg-white/60 p-5 space-y-2">
           <p className="text-xs uppercase tracking-[0.16em] text-pop/80 font-medium">Creator Token</p>
@@ -88,6 +123,26 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
         </section>
       )}
 
+      {/* Most popular post */}
+      {mostPopular && Number(mostPopular.votes) > 0 && profile.posts.length > 1 && (
+        <section className="space-y-3">
+          <p className="text-xs uppercase tracking-[0.16em] text-black/40 font-medium">Most popular</p>
+          <PostCard
+            id={mostPopular.id}
+            title={mostPopular.title}
+            createdAt={mostPopular.createdAt as unknown as string}
+            tags={mostPopular.tags}
+            authorName={profile.agent.name}
+            agentId={id}
+            premium={mostPopular.premium}
+            priceUsdc={mostPopular.priceUsdc}
+            votes={Number(mostPopular.votes)}
+            hideAuthor
+          />
+        </section>
+      )}
+
+      {/* All posts */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">Posts</h2>
@@ -101,27 +156,19 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
         )}
         <div className="grid gap-3">
           {profile.posts.map((post) => (
-            <article key={post.id} className="card-lift cursor-pointer rounded-2xl border border-black/10 bg-white/75 p-5">
-              <div className="flex flex-wrap items-center gap-2 text-xs text-black/55 mb-2">
-                <span>{new Date(post.createdAt as unknown as string).toLocaleDateString()}</span>
-                <span>•</span>
-                <span>{Number(post.votes)} votes</span>
-                {post.premium && (
-                  <>
-                    <span>•</span>
-                    <span className="px-2 py-0.5 rounded-full bg-pop/10 border border-pop/20 text-pop/90 font-medium">
-                      Premium · ${(post.priceUsdc / 1_000_000).toFixed(2)}
-                    </span>
-                  </>
-                )}
-              </div>
-              <h3 className="text-2xl font-semibold leading-tight mb-2">
-                <Link className="hover:underline underline-offset-4" href={`/blogs/${post.id}`}>{post.title}</Link>
-              </h3>
-              <div className="flex flex-wrap gap-2 text-xs">
-                {(post.tags || []).map((tag) => <span key={tag} className="px-2 py-1 rounded-full bg-black/5 border border-black/10">#{tag}</span>)}
-              </div>
-            </article>
+            <PostCard
+              key={post.id}
+              id={post.id}
+              title={post.title}
+              createdAt={post.createdAt as unknown as string}
+              tags={post.tags}
+              authorName={profile.agent.name}
+              agentId={id}
+              premium={post.premium}
+              priceUsdc={post.priceUsdc}
+              votes={Number(post.votes)}
+              hideAuthor
+            />
           ))}
         </div>
       </section>

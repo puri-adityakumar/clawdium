@@ -7,7 +7,7 @@ import { renderMarkdown } from '@/lib/markdown';
 import { verifyApiKey } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { incrementPremiumPosts, incrementAgentApiCalls } from '@/lib/metrics';
-import { listPosts } from '@/lib/data';
+import { listPosts, searchPosts } from '@/lib/data';
 
 export const runtime = 'nodejs';
 
@@ -24,10 +24,23 @@ const bodySchema = z.object({
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const q = searchParams.get('q');
   const tag = searchParams.get('tag') || null;
   const author = searchParams.get('author') || null;
   const sort = searchParams.get('sort') === 'top' ? 'top' : 'new';
   const limit = Number(searchParams.get('limit') || 20);
+  const offset = Number(searchParams.get('offset') || 0);
+
+  // Full-text search via ?q=
+  if (q && q.trim()) {
+    const results = await searchPosts(q, limit);
+    const feed = results.map(row => ({
+      ...row,
+      bodyHtml: undefined,
+      excerpt: row.premium ? undefined : row.excerpt,
+    }));
+    return NextResponse.json({ posts: feed });
+  }
 
   const rows = await listPosts({ limit, tag, author, sort });
 

@@ -18,3 +18,13 @@
 .env.local
 .env.production
 .env.development
+task.md
+shot-*.png
+
+#skills
+
+.claude/
+.agents/
+
+# Local planning docs
+docs/

@@ -109,14 +109,14 @@ export async function launchAgentToken(agentId: string, params: LaunchTokenParam
   for (const bundle of feeConfig.bundles) {
     for (const tx of bundle) {
       tx.sign([keypair]);
-      const sig = await connection.sendTransaction(tx);
+      const sig = await connection.sendRawTransaction(tx.serialize());
       const confirm = await connection.confirmTransaction(sig, 'confirmed');
       if (confirm.value.err) throw new Error(`Fee config tx failed: ${JSON.stringify(confirm.value.err)}`);
     }
   }
   for (const tx of feeConfig.transactions) {
     tx.sign([keypair]);
-    const sig = await connection.sendTransaction(tx);
+    const sig = await connection.sendRawTransaction(tx.serialize());
     const confirm = await connection.confirmTransaction(sig, 'confirmed');
     if (confirm.value.err) throw new Error(`Fee config tx failed: ${JSON.stringify(confirm.value.err)}`);
   }
@@ -131,7 +131,7 @@ export async function launchAgentToken(agentId: string, params: LaunchTokenParam
   });
 
   launchTx.sign([keypair]);
-  const launchSig = await connection.sendTransaction(launchTx);
+  const launchSig = await connection.sendRawTransaction(launchTx.serialize());
   const launchConfirm = await connection.confirmTransaction(launchSig, 'confirmed');
   if (launchConfirm.value.err) throw new Error(`Launch tx failed: ${JSON.stringify(launchConfirm.value.err)}`);
 
@@ -171,14 +171,14 @@ export async function claimAgentFees(agentId: string) {
 
   const connection = getSolanaConnection();
   const signatures: string[] = [];
+  const seenMints = new Set<string>();
   for (const position of positions) {
-    const txs = await sdk.fee.getClaimTransaction(keypair.publicKey, position);
+    const mint = position.baseMint;
+    if (seenMints.has(mint)) continue;
+    seenMints.add(mint);
+    const txs = await sdk.fee.getClaimTransactions(keypair.publicKey, new PublicKey(mint));
     for (const tx of txs) {
-      if (tx instanceof VersionedTransaction) {
-        tx.sign([keypair]);
-      } else {
-        (tx as Transaction).sign(keypair);
-      }
+      tx.sign(keypair);
       const sig = await connection.sendRawTransaction(tx.serialize());
       const confirm = await connection.confirmTransaction(sig, 'confirmed');
       if (confirm.value.err) throw new Error(`Claim tx failed: ${JSON.stringify(confirm.value.err)}`);
