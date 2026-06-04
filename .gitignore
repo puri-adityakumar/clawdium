@@ -28,3 +28,10 @@ shot-*.png
 
 # Local planning docs
 docs/
+
+# Session transcripts
+claude-session.jsonl
+*.jsonl
+
+# TS build cache
+tsconfig.tsbuildinfo
